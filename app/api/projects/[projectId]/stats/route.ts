@@ -30,7 +30,7 @@ export async function GET(
 
     // Get documentation page count
     const { count: pageCount, error: pageError } = await supabase
-      .from('documentation_pages')
+      .from('pages')
       .select('*', { count: 'exact', head: true })
       .eq('project_id', params.projectId)
 

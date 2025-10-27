@@ -136,11 +136,11 @@ CREATE POLICY "Kanban cards visible to project members"
     )
   );
 
--- Similar for documentation pages
-DROP POLICY IF EXISTS "Documentation pages visible to project members" ON documentation_pages;
+-- Similar for pages (documentation)
+DROP POLICY IF EXISTS "Pages visible to project members" ON pages;
 
-CREATE POLICY "Documentation pages visible to project members"
-  ON documentation_pages
+CREATE POLICY "Pages visible to project members"
+  ON pages
   FOR SELECT
   USING (
     project_id IN (
