@@ -13,10 +13,8 @@ import { getPageById, setProjectPages, getProjectPages } from '@/lib/stores/page
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { getCurrentUser } from '@/lib/supabase/auth'
 import { logActivity } from '@/hooks/use-activity'
-import { useRealtimeCollaboration } from '@/hooks/use-realtime-collaboration'
-import { useWebSocketCollaboration } from '@/hooks/use-websocket-collaboration'
-import { EditingIndicator } from '@/components/editor/remote-cursors'
-import { TypingIndicator } from '@/components/editor/typing-indicator'
+import { useCollaboration } from '@/hooks/useCollaboration'
+import { CollaboratorPresence } from '@/components/editor/CollaboratorPresence'
 
 export default function EditorPage({
   params,
@@ -35,11 +33,8 @@ export default function EditorPage({
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [editorError, setEditorError] = useState<string | null>(null)
-  const { remoteUsers } = useRealtimeCollaboration(
-    params.pageId,
-    currentUser?.id || '',
-    currentUser?.user_metadata?.name || currentUser?.email || 'Anonymous'
-  )
+  const [isTyping, setIsTyping] = useState(false)
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   // Fetch page from database if not in store
   useEffect(() => {
@@ -107,15 +102,31 @@ export default function EditorPage({
     fetchUser()
   }, [])
 
-  // Initialize WebSocket collaboration (disabled for now)
-  // const { content: wsContent, remoteUsers: wsRemoteUsers, sendContentUpdate, sendTyping } = useWebSocketCollaboration(
-  //   params.pageId,
-  //   currentUser?.id || '',
-  //   currentUser?.user_metadata?.name || currentUser?.email || 'Anonymous'
-  // )
-  const sendTyping = () => {}
-  const sendContentUpdate = () => {}
-  const wsRemoteUsers: any[] = []
+  // Callback for content changes from remote users
+  const handleRemoteContentChange = useCallback((content: string) => {
+    console.log('[Editor] Received remote content change, length:', content.length)
+    setPageContent(content)
+  }, [])
+
+  // Initialize WebSocket collaboration (only if user is ready)
+  const { isConnected, remoteUsers, sendDocumentChange, sendTypingStatus } = useCollaboration(
+    currentUser?.id
+      ? {
+          pageId: params.pageId,
+          projectId: params.projectId,
+          userId: currentUser?.id,
+          userName: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Anonymous',
+          userEmail: currentUser?.email || '',
+          onContentChange: handleRemoteContentChange,
+        }
+      : {
+          pageId: '',
+          projectId: '',
+          userId: '',
+          userName: '',
+          userEmail: '',
+        }
+  )
 
   const autoSaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const hasContentChangesRef = React.useRef(false)
@@ -186,6 +197,24 @@ export default function EditorPage({
 
   const handleContentChange = (content: string) => {
     setPageContent(content)
+    
+    // Send content change via WebSocket if connected
+    if (isConnected && currentUser?.id) {
+      sendDocumentChange(content)
+    }
+    
+    // Send typing status
+    setIsTyping(true)
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    sendTypingStatus(true)
+    
+    // Reset typing status after 3 seconds of no activity
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false)
+      sendTypingStatus(false)
+    }, 3000)
   }
 
   const handleSaveContent = useCallback(async () => {
@@ -360,12 +389,17 @@ export default function EditorPage({
           )}
 
           {/* Collaboration Indicator */}
-          {(remoteUsers.length > 0 || wsRemoteUsers.length > 0) && (
-            <div className="mb-4 space-y-2">
-              {remoteUsers.length > 0 && <EditingIndicator remoteUsers={remoteUsers} />}
-              {wsRemoteUsers.length > 0 && <TypingIndicator remoteUsers={wsRemoteUsers} />}
+          {remoteUsers.length > 0 && (
+            <div className="mb-4">
+              <CollaboratorPresence remoteUsers={remoteUsers} currentUserId={currentUser?.id || ''} />
             </div>
           )}
+          
+          {/* Connection Status */}
+          <div className="flex items-center gap-2 text-xs">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className="text-muted-foreground">{isConnected ? 'Connected' : 'Connecting...'}</span>
+          </div>
 
           {/* Metadata */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
