@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
@@ -29,6 +29,8 @@ export function CollaborativeEditor({
   readOnly = false,
   className,
 }: CollaborativeEditorProps) {
+  const [lastContent, setLastContent] = useState(content)
+  
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -55,6 +57,21 @@ export function CollaborativeEditor({
       onChange(editor.getHTML())
     },
   })
+
+  // Update editor when content changes from remote users
+  useEffect(() => {
+    if (!editor || content === lastContent) return
+    
+    console.log('[Editor] Syncing remote content change')
+    setLastContent(content)
+    
+    // Check if editor has focus
+    const hasFocus = editor.isFocused
+    if (!hasFocus) {
+      // Only update if not focused to avoid interrupting user input
+      editor.commands.setContent(content, false)
+    }
+  }, [content, editor, lastContent])
 
   const handleAddImage = useCallback(() => {
     const url = window.prompt('Enter image URL:')
