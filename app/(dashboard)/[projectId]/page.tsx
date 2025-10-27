@@ -1,21 +1,24 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useProjectStore } from '@/lib/stores/project-store'
 import { useProjectMembers } from '@/hooks/useProjectMembers'
+import { TeamMembersPanel } from '@/components/project/TeamMembersPanel'
 import { Plus, Users, FileText, Zap } from 'lucide-react'
 
 export default function ProjectOverviewPage() {
   const params = useParams()
+  const router = useRouter()
   const projectId = (params?.projectId as string) || ''
   const { projects } = useProjectStore()
   const project = projects.find((p) => p.id === projectId)
   const { members, loading: membersLoading } = useProjectMembers(projectId || null)
   const [pageCount, setPageCount] = useState(0)
   const [taskCount, setTaskCount] = useState(0)
+  const [showMembersPanel, setShowMembersPanel] = useState(false)
 
   useEffect(() => {
     if (!projectId) return
@@ -142,20 +145,39 @@ export default function ProjectOverviewPage() {
           <div className="pt-4 border-t">
             <h3 className="text-sm font-semibold mb-3">Quick Actions</h3>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowMembersPanel(!showMembersPanel)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Member
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => router.push(`/dashboard/${projectId}/docs`)}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 New Page
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => router.push(`/dashboard/${projectId}/board`)}
+              >
                 <Zap className="h-4 w-4 mr-2" />
                 New Task
               </Button>
             </div>
           </div>
+
+          {/* Members Panel */}
+          {showMembersPanel && (
+            <div className="pt-4 border-t">
+              <TeamMembersPanel projectId={projectId} currentUserRole="admin" />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
