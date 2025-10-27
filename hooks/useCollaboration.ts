@@ -35,18 +35,36 @@ export function useCollaboration({
   const [remoteUsers, setRemoteUsers] = useState<RemoteUser[]>([])
   const [documentVersion, setDocumentVersion] = useState(0)
   const [lastSyncTime, setLastSyncTime] = useState(Date.now())
+  
+  // Store callback refs to avoid stale closures
+  const onContentChangeRef = useRef(onContentChange)
+  const onRemoteUserUpdateRef = useRef(onRemoteUserUpdate)
+  
+  // Update refs when callbacks change
+  useEffect(() => {
+    onContentChangeRef.current = onContentChange
+  }, [onContentChange])
+  
+  useEffect(() => {
+    onRemoteUserUpdateRef.current = onRemoteUserUpdate
+  }, [onRemoteUserUpdate])
 
   // Initialize WebSocket connection
   useEffect(() => {
-    if (!pageId || !projectId) return
+    if (!pageId || !projectId || !userId || !userName || !userEmail) return
+    
+    // Prevent multiple connections
+    if (socketRef.current?.connected) return
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000'
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080'
 
     const socket = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
+      transports: ['websocket', 'polling'],
+      forceNew: false,
     })
 
     socket.on('connect', () => {
@@ -73,13 +91,14 @@ export function useCollaboration({
       version: number
       activeUsers: RemoteUser[]
     }) => {
+      console.log('[Collaboration] Received document state:', data.content.length)
       setDocumentVersion(data.version)
       setRemoteUsers(data.activeUsers)
-      if (onContentChange) {
-        onContentChange(data.content)
+      if (onContentChangeRef.current) {
+        onContentChangeRef.current(data.content)
       }
-      if (onRemoteUserUpdate) {
-        onRemoteUserUpdate(data.activeUsers)
+      if (onRemoteUserUpdateRef.current) {
+        onRemoteUserUpdateRef.current(data.activeUsers)
       }
     })
 
@@ -90,10 +109,14 @@ export function useCollaboration({
       userId: string
       timestamp: number
     }) => {
+      console.log('[Collaboration] Remote content change received from userId:', data.userId, 'Current userId:', userId)
       setDocumentVersion(data.version)
       setLastSyncTime(data.timestamp)
-      if (onContentChange) {
-        onContentChange(data.content)
+      if (data.userId !== userId) {
+        console.log('[Collaboration] Updating local content from remote user')
+        if (onContentChangeRef.current) {
+          onContentChangeRef.current(data.content)
+        }
       }
     })
 
@@ -106,8 +129,8 @@ export function useCollaboration({
     }) => {
       console.log(`${data.userName} joined the collaboration`)
       setRemoteUsers(data.activeUsers)
-      if (onRemoteUserUpdate) {
-        onRemoteUserUpdate(data.activeUsers)
+      if (onRemoteUserUpdateRef.current) {
+        onRemoteUserUpdateRef.current(data.activeUsers)
       }
     })
 
@@ -119,8 +142,8 @@ export function useCollaboration({
     }) => {
       console.log(`${data.userName} left the collaboration`)
       setRemoteUsers(data.activeUsers)
-      if (onRemoteUserUpdate) {
-        onRemoteUserUpdate(data.activeUsers)
+      if (onRemoteUserUpdateRef.current) {
+        onRemoteUserUpdateRef.current(data.activeUsers)
       }
     })
 
@@ -177,14 +200,17 @@ export function useCollaboration({
     socketRef.current = socket
 
     return () => {
-      socket.disconnect()
+      if (socket.connected) {
+        socket.disconnect()
+      }
     }
-  }, [pageId, projectId, userId, userName, userEmail, onContentChange, onRemoteUserUpdate])
+  }, [pageId, projectId, userId])
 
   // Send document change
   const sendDocumentChange = useCallback(
     (content: string, operation?: { type: 'insert' | 'delete'; position: number; text?: string }) => {
-      if (socketRef.current && isConnected) {
+      if (socketRef.current?.connected) {
+        console.log('[Collaboration] Sending document change:', { pageId, projectId, userId, contentLength: content.length })
         socketRef.current.emit('document-change', {
           pageId,
           projectId,
@@ -194,9 +220,11 @@ export function useCollaboration({
           timestamp: Date.now(),
           operation,
         })
+      } else {
+        console.warn('[Collaboration] Socket not connected, cannot send change')
       }
     },
-    [pageId, projectId, userId, documentVersion, isConnected]
+    [pageId, projectId, userId, documentVersion]
   )
 
   // Send cursor update
