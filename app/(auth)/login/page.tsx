@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,6 +41,7 @@ export default function LoginPage() {
   const { setUser } = useUserStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -74,42 +76,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleDemoMode = async () => {
-    try {
-      setLoading(true)
-      // Sign in with demo credentials
-      const { user } = await signInWithEmail('demo@froncort.com', 'demo1234')
-      
-      if (user) {
-        setUser(
-          {
-            id: user.id,
-            email: user.email || 'demo@froncort.com',
-            name: 'Demo User',
-            createdAt: new Date(user.created_at),
-          },
-          'editor'
-        )
-        toast.success('Demo mode activated!')
-        router.push('/')
-      }
-    } catch (err) {
-      // Fallback to mock if demo account doesn't exist
-      setUser(
-        {
-          id: 'demo-user',
-          email: 'demo@froncort.com',
-          name: 'Demo User',
-          createdAt: new Date(),
-        },
-        'editor'
-      )
-      toast.success('Demo mode activated!')
-      router.push('/')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-background">
@@ -252,39 +218,36 @@ export default function LoginPage() {
               <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </motion.form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleDemoMode}
-            disabled={loading}
-          >
-            Enter Demo Mode
-          </Button>
 
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
