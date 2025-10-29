@@ -7,6 +7,7 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Mention from '@tiptap/extension-mention'
 import { EditorToolbar } from './editor-toolbar'
+import { ExportMenu } from './export-menu'
 import { cn } from '@/lib/utils/cn'
 import { Check, AlertCircle, Loader } from 'lucide-react'
 
@@ -18,6 +19,7 @@ interface CollaborativeEditorProps {
   error?: string | null
   readOnly?: boolean
   className?: string
+  title?: string
 }
 
 export function CollaborativeEditor({
@@ -28,6 +30,7 @@ export function CollaborativeEditor({
   error = null,
   readOnly = false,
   className,
+  title = 'Document',
 }: CollaborativeEditorProps) {
   const [lastContent, setLastContent] = useState(content)
   
@@ -123,7 +126,10 @@ export function CollaborativeEditor({
             </div>
           )}
         </div>
-        <span className="text-muted-foreground">{readOnly ? 'Read-only' : 'Editing'}</span>
+        <div className="flex items-center gap-4">
+          <ExportMenu title={title} content={content} />
+          <span className="text-muted-foreground">{readOnly ? 'Read-only' : 'Editing'}</span>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto">
