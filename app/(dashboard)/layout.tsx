@@ -7,6 +7,7 @@ import { useProjectStore } from '@/lib/stores/project-store'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { Sidebar } from '@/components/navigation/sidebar'
 import { DashboardHeader } from '@/components/navigation/dashboard-header'
+import { CardLoader } from '@/components/Loaders/CardLoader'
 import { useTheme } from 'next-themes'
 import { useSessionRestore } from '@/hooks/use-session-restore'
 import { sessionManager } from '@/lib/session-manager'
@@ -45,16 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [isHydrating, isAuthenticated, router])
 
-  // Show loading while hydrating
-  if (isHydrating) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="text-muted-foreground">Loading...</div>
-        </div>
-      </div>
-    )
-  }
+  // Don't block rendering during hydration - let components handle their own loading states
 
   // Always render the layout, redirect will happen via useEffect
   // This prevents the 404 page from showing

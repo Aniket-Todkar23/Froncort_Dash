@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -129,6 +130,14 @@ export function Sidebar() {
     }
   }
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setSidebarOpen(false)
+    }
+  }
+
   if (!sidebarOpen) {
     return null
   }
@@ -138,22 +147,24 @@ export function Sidebar() {
       {/* Logo & Close */}
       <div className="p-6 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-primary text-primary-foreground">
-              <FolderOpen size={20} />
-            </div>
-            <span className="font-bold text-lg">Froncort</span>
+          <Link href="/" className="flex items-center gap-2 whitespace-nowrap">
+            <Image src="/penrose_image.png" alt="Froncort Logo" width={32} height={32} className="rounded-lg" />
+            <span className="font-bold text-lg">Froncort<span className="text-primary"> Forge</span></span>
           </Link>
           <Button
             size="icon"
             variant="ghost"
             onClick={() => setSidebarOpen(false)}
+            className="md:hidden"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
         <Button
-          onClick={() => router.push('/')}
+          onClick={() => {
+            router.push('/')
+            handleLinkClick()
+          }}
           variant="outline"
           size="sm"
           className="w-full flex items-center justify-center gap-2"
@@ -263,6 +274,7 @@ export function Sidebar() {
                   <div className="ml-4 mt-1 space-y-1 border-l border-muted pl-3">
                     <Link
                       href={`/${project.id}`}
+                      onClick={handleLinkClick}
                       className={cn(
                         'block px-3 py-2 rounded-md text-sm transition-colors',
                         pathname === `/${project.id}`
@@ -274,6 +286,7 @@ export function Sidebar() {
                     </Link>
                     <Link
                       href={`/${project.id}/docs`}
+                      onClick={handleLinkClick}
                       className={cn(
                         'block px-3 py-2 rounded-md text-sm transition-colors',
                         pathname?.includes(`/${project.id}/docs`)
@@ -285,6 +298,7 @@ export function Sidebar() {
                     </Link>
                     <Link
                       href={`/${project.id}/board`}
+                      onClick={handleLinkClick}
                       className={cn(
                         'block px-3 py-2 rounded-md text-sm transition-colors',
                         pathname?.includes(`/${project.id}/board`)
@@ -296,6 +310,7 @@ export function Sidebar() {
                     </Link>
                     <Link
                       href={`/${project.id}/activity`}
+                      onClick={handleLinkClick}
                       className={cn(
                         'block px-3 py-2 rounded-md text-sm transition-colors',
                         pathname?.includes(`/${project.id}/activity`)
@@ -307,6 +322,7 @@ export function Sidebar() {
                     </Link>
                     <Link
                       href={`/${project.id}/settings`}
+                      onClick={handleLinkClick}
                       className={cn(
                         'block px-3 py-2 rounded-md text-sm transition-colors',
                         pathname?.includes(`/${project.id}/settings`)

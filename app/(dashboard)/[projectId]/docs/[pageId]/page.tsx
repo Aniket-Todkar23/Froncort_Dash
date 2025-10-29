@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { notFound } from 'next/navigation'
 import { CollaborativeEditor } from '@/components/editor/collaborative-editor'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +14,7 @@ import { getPageById, setProjectPages, getProjectPages } from '@/lib/stores/page
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { getCurrentUser } from '@/lib/supabase/auth'
 import { logActivity } from '@/hooks/use-activity'
-import { useCollaboration } from '@/hooks/useCollaboration'
+import { useSocketCollaboration } from '@/hooks/use-socket-collaboration'
 import { CollaboratorPresence } from '@/components/editor/CollaboratorPresence'
 
 export default function EditorPage({
@@ -58,7 +59,10 @@ export default function EditorPage({
 
         if (fetchError) {
           if (fetchError.code === 'PGRST116') {
-            setError('Page not found')
+            // Page doesn't exist in database
+            setLoading(false)
+            notFound()
+            return
           } else {
             setError(fetchError.message)
           }
@@ -76,7 +80,10 @@ export default function EditorPage({
             setProjectPages(params.projectId, [...allPages, data])
           }
         } else {
-          setError('Page not found')
+          // No data returned
+          setLoading(false)
+          notFound()
+          return
         }
       } catch (err) {
         console.error('Error fetching page:', err)
@@ -102,31 +109,22 @@ export default function EditorPage({
     fetchUser()
   }, [])
 
-  // Callback for content changes from remote users
-  const handleRemoteContentChange = useCallback((content: string) => {
-    console.log('[Editor] Received remote content change, length:', content.length)
-    setPageContent(content)
-  }, [])
-
-  // Initialize WebSocket collaboration (only if user is ready)
-  const { isConnected, remoteUsers, sendDocumentChange, sendTypingStatus } = useCollaboration(
-    currentUser?.id
-      ? {
-          pageId: params.pageId,
-          projectId: params.projectId,
-          userId: currentUser?.id,
-          userName: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Anonymous',
-          userEmail: currentUser?.email || '',
-          onContentChange: handleRemoteContentChange,
-        }
-      : {
-          pageId: '',
-          projectId: '',
-          userId: '',
-          userName: '',
-          userEmail: '',
-        }
+  // Initialize Socket.io collaboration (only if user is ready)
+  const { content: remoteContent, remoteUsers, connected: isConnected, sendContentUpdate } = useSocketCollaboration(
+    params.pageId,
+    params.projectId,
+    currentUser?.id || '',
+    currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Anonymous',
+    currentUser?.email || ''
   )
+
+  // Sync remote content changes to local state
+  useEffect(() => {
+    if (remoteContent && remoteContent !== pageContent) {
+      console.log('[Editor] Syncing remote content, length:', remoteContent.length)
+      setPageContent(remoteContent)
+    }
+  }, [remoteContent])
 
   const autoSaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const hasContentChangesRef = React.useRef(false)
@@ -197,24 +195,12 @@ export default function EditorPage({
 
   const handleContentChange = (content: string) => {
     setPageContent(content)
+    hasContentChangesRef.current = true
     
-    // Send content change via WebSocket if connected
+    // Send content change via Socket.io if connected
     if (isConnected && currentUser?.id) {
-      sendDocumentChange(content)
+      sendContentUpdate(content)
     }
-    
-    // Send typing status
-    setIsTyping(true)
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current)
-    }
-    sendTypingStatus(true)
-    
-    // Reset typing status after 3 seconds of no activity
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false)
-      sendTypingStatus(false)
-    }, 3000)
   }
 
   const handleSaveContent = useCallback(async () => {
@@ -332,11 +318,7 @@ export default function EditorPage({
   }
 
   if (!page) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-muted-foreground">Page not found</div>
-      </div>
-    )
+    notFound()
   }
 
   return (
@@ -428,6 +410,7 @@ export default function EditorPage({
             lastSaved={lastSaved}
             error={editorError}
             className="min-h-96"
+            title={title}
           />
         </div>
       </div>

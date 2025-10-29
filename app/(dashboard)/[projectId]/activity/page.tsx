@@ -50,6 +50,12 @@ function ActivityAction({ action }: { action: string }) {
 }
 
 function ActivityItem({ activity }: { activity: any }) {
+  const resourceTypeLabel = {
+    page: 'Page',
+    card: 'Task',
+    member: 'Member',
+  }[activity.resource_type] || activity.resource_type
+
   return (
     <div className="flex gap-4 py-4 px-6 hover:bg-muted/30 border-b border-border last:border-0 transition-colors">
       {/* Icon */}
@@ -59,24 +65,15 @@ function ActivityItem({ activity }: { activity: any }) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="font-medium text-sm">{activity.resource_name}</span>
           <ActivityAction action={activity.action} />
+          <span className="text-xs text-muted-foreground bg-muted rounded px-2 py-0.5">{resourceTypeLabel}</span>
         </div>
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Resource: {activity.resource_type}</span>
-          <span className="text-muted-foreground/50">•</span>
           <span>{formatRelativeTime(new Date(activity.created_at))}</span>
         </div>
-
-        {activity.changes && (
-          <div className="mt-2 text-xs bg-muted/50 rounded px-2 py-1 max-w-sm">
-            <p className="text-muted-foreground">
-              {JSON.stringify(activity.changes).substring(0, 100)}...
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )
