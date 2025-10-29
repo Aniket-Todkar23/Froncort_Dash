@@ -1,15 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import Lottie from '@/components/ui/lottie'
 import { useUserStore } from '@/lib/stores/user-store'
 import { toast } from 'sonner'
-import { Briefcase } from 'lucide-react'
 import { signInWithEmail } from '@/lib/supabase/auth'
+
+const TypingText = ({ text, delay = 0 }: { text: string; delay?: number }) => {
+  const [displayedText, setDisplayedText] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      let index = 0
+      const interval = setInterval(() => {
+        if (index < text.length) {
+          setDisplayedText(text.slice(0, index + 1))
+          index++
+        } else {
+          clearInterval(interval)
+        }
+      }, 50)
+      return () => clearInterval(interval)
+    }, delay)
+    return () => clearTimeout(timer)
+  }, [text, delay])
+
+  return <span>{displayedText}</span>
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -88,20 +112,128 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center pb-2">
-            <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary text-primary-foreground">
-              <Briefcase size={24} />
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
+      {/* Left Column - Hero Section + Lottie Animation (Desktop) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="top-10 hidden lg:flex flex-1 lg:w-1/2 items-center justify-center p-8 relative"
+      >
+        {/* Hero Text - Positioned above animation */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="absolute top-6  lg:left- text-center z-10 w-full px-4 max-w lg:w-[1000px]"
+        >
+          <div className="text-3xl lg:text-5xl font-bold mb-0 tracking-tight leading-tight">
+            <div className="text-center">Collaborate with
+              <motion.span
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="text-primary ml-2"
+              >
+                <TypingText text="Purpose" delay={600} />
+              </motion.span>
+            </div>
+            <div className="text-sm lg:text-lg text-muted-foreground mt-3 lg:mt-2 text-center">
+              <TypingText text="Real-time collaboration & task management" delay={1500} />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome to Froncort</CardTitle>
-          <CardDescription>Collaborative project management simplified</CardDescription>
+        </motion.div>
+
+        {/* Lottie Animation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <Lottie />
+        </motion.div>
+
+        {/* Glowing separator line */}
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/50 to-transparent shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)] blur-sm"></div>
+      </motion.div>
+
+      {/* Mobile Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.1 }}
+        className="flex lg:hidden w-full flex-col items-center justify-center p-4 py-8"
+      >
+        <div className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-center">
+          Collaborate with
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-primary block sm:inline ml-0 sm:ml-2 mt-2 sm:mt-0"
+          >
+            <TypingText text="Purpose" delay={400} />
+          </motion.span>
+        </div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="text-sm text-muted-foreground text-center max-w-xs"
+        >
+          <TypingText text="Real-time collaboration & team coordination" delay={1200} />
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mt-4 w-40 h-40"
+        >
+          <Lottie />
+        </motion.div>
+      </motion.div>
+
+      {/* Right Column - Login Form */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="flex w-full lg:w-1/2 items-center justify-center p-2 sm:p-6"
+      >
+      <Card className="w-full max-w-md shadow-lg shadow-primary/20">
+        <CardHeader className="space-y-2 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex justify-center pb-2"
+          >
+            <Image src="/penrose_image.png" alt="Froncort Logo" width={40} height={40} className="rounded-lg" />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <CardTitle className="text-xl sm:text-2xl whitespace-nowrap">Welcome to Froncort<span className="text-primary"> Forge</span></CardTitle>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <CardDescription>Manage, collaborate, execute - all in one place</CardDescription>
+          </motion.div>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <form onSubmit={handleLogin} className="space-y-4">
+          <motion.form
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            onSubmit={handleLogin}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 Email
@@ -133,7 +265,7 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
-          </form>
+          </motion.form>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -162,6 +294,7 @@ export default function LoginPage() {
           </p>
         </CardContent>
       </Card>
+      </motion.div>
     </div>
   )
 }
