@@ -2,12 +2,13 @@
 
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/lib/stores/user-store'
 import { Moon, Sun, Bell, LogOut, Settings, Menu } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useUIStore } from '@/lib/stores/ui-store'
 import { useState, useEffect } from 'react'
+import { usePageLoading } from '@/hooks/use-page-loading'
+import { SearchBar } from './search-bar'
 
 export function DashboardHeader() {
   const router = useRouter()
@@ -15,10 +16,16 @@ export function DashboardHeader() {
   const { currentUser, logout } = useUserStore()
   const { sidebarOpen, setSidebarOpen } = useUIStore()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const { startLoading, stopLoading } = usePageLoading()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    startLoading()
     logout()
-    router.push('/login')
+    await router.push('/login')
+    // Stop loader after navigation
+    setTimeout(() => {
+      stopLoading()
+    }, 500)
   }
 
   const toggleTheme = () => {
@@ -37,8 +44,8 @@ export function DashboardHeader() {
           <Menu className="h-4 w-4" />
         </Button>
 
-        <div className="hidden md:flex w-full max-w-sm">
-          <Input placeholder="Search pages, tasks..." className="pl-4" />
+        <div className="hidden md:flex w-full">
+          <SearchBar />
         </div>
       </div>
 
