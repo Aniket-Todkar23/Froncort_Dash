@@ -9,8 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "seed": "ts-node scripts/seed-database.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -32,7 +31,6 @@
     "@tiptap/react": "^2.1.0",
     "@tiptap/starter-kit": "^2.1.0",
     "axios": "^1.6.0",
-    "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
