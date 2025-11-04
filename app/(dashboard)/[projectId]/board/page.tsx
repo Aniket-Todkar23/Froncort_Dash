@@ -251,7 +251,7 @@ function DraggableCard({ card, users, onEdit }: { card: any; users: any[]; onEdi
 }
 
 export default function KanbanPage({ params }: { params: { projectId: string } }) {
-  const { currentProject } = useProjectStore()
+  const { currentProject, projects, setCurrentProject } = useProjectStore()
   const [cards, setCards] = useState<any[]>([])
   const [columns, setColumns] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -266,6 +266,14 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
   const [editCardTitle, setEditCardTitle] = useState('')
   const [editCardDesc, setEditCardDesc] = useState('')
   const [editCardAssignee, setEditCardAssignee] = useState<string | null>(null)
+
+  // Sync current project when component mounts or projectId changes
+  useEffect(() => {
+    const project = projects.find((p) => p.id === params.projectId)
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [params.projectId, projects, setCurrentProject])
 
   // Fetch board, columns, and cards from database
   useEffect(() => {
