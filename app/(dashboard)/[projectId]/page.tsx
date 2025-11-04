@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,9 +12,16 @@ export default function ProjectOverviewPage() {
   const params = useParams()
   const router = useRouter()
   const projectId = (params?.projectId as string) || ''
-  const { projects } = useProjectStore()
+  const { projects, setCurrentProject } = useProjectStore()
   const project = projects.find((p) => p.id === projectId)
   const [showMembersPanel, setShowMembersPanel] = useState(false)
+
+  // Sync current project when component mounts or projectId changes
+  React.useEffect(() => {
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [projectId, project, setCurrentProject])
 
   // Get member count from project data
   const memberCount = Array.isArray(project?.members) ? project.members.length : 0
