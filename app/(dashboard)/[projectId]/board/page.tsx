@@ -69,16 +69,16 @@ function ColumnComponent({
       key={column.id}
       ref={setNodeRef}
       className={cn(
-        'flex-shrink-0 w-96 flex flex-col bg-muted/30 rounded-lg border border-border transition-colors',
-        isOver && 'bg-primary/10 border-primary'
+        'flex-shrink-0 w-96 flex flex-col bg-card rounded-xl border border-border transition-all duration-200 shadow-sm overflow-hidden',
+        isOver && 'bg-primary/5 border-primary shadow-md ring-2 ring-primary/20'
       )}
     >
       {/* Column Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border/50 bg-gradient-to-r from-card to-card/95">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold flex items-center gap-2">
+          <h3 className="font-semibold flex items-center gap-2 text-foreground">
             {column.name}
-            <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
+            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">
               {columnCards.length}
             </span>
           </h3>
@@ -90,14 +90,14 @@ function ColumnComponent({
         items={columnCards.map((c) => c.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="flex-1 overflow-auto p-3 space-y-3 min-h-[100px]">
+        <div className="flex-1 overflow-auto p-3 space-y-3 min-h-[100px] bg-gradient-to-b from-card/50 to-card">
           {columnCards.map((card) => (
             <DraggableCard key={card.id} card={card} users={users} onEdit={onEdit} />
           ))}
 
           {columnCards.length === 0 && (
-            <div className="text-xs text-muted-foreground text-center py-8">
-              No cards yet. Drag cards here or create new ones.
+            <div className="text-xs text-muted-foreground text-center py-8 italic opacity-60">
+              Drop cards here to get started
             </div>
           )}
         </div>
@@ -110,31 +110,31 @@ function ColumnComponent({
             parentSetIsAddingCard(true)
             parentSetSelectedColumnId(column.id)
           }}
-          className="p-3 text-xs text-muted-foreground hover:bg-background transition-colors flex items-center gap-2 border-t border-border w-full"
+          className="p-3 text-xs text-muted-foreground hover:text-foreground hover:bg-primary/5 transition-all duration-200 flex items-center gap-2 border-t border-border/50 w-full group"
         >
-          <Plus className="h-4 w-4" />
-          Add card
+          <Plus className="h-4 w-4 transition-transform group-hover:scale-110" />
+          <span className="group-hover:font-medium">Add card</span>
         </button>
       ) : (
-        <div className="p-3 border-t border-border space-y-2">
+        <div className="p-4 border-t border-border/50 space-y-3 bg-primary/5">
           <input
             type="text"
             placeholder="Card title..."
             value={parentNewCardTitle}
             onChange={(e) => parentSetNewCardTitle(e.target.value)}
             autoFocus
-            className="w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground"
+            className="w-full px-3 py-2 text-xs border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
           />
           <textarea
             placeholder="Description (optional)"
             value={parentNewCardDesc}
             onChange={(e) => parentSetNewCardDesc(e.target.value)}
-            className="w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground resize-none h-20"
+            className="w-full px-3 py-2 text-xs border border-border rounded-md bg-card text-foreground resize-none h-20 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
           />
           <select
             value={parentSelectedAssignee || ''}
             onChange={(e) => parentSetSelectedAssignee(e.target.value || null)}
-            className="w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground"
+            className="w-full px-3 py-2 text-xs border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
           >
             <option value="">Assign to...</option>
             {users.map((user) => (
@@ -147,7 +147,7 @@ function ColumnComponent({
             <button
               onClick={handleCreateCard}
               disabled={!parentNewCardTitle.trim()}
-              className="flex-1 px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-3 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Create
             </button>
@@ -159,7 +159,7 @@ function ColumnComponent({
                 parentSetNewCardDesc('')
                 parentSetSelectedAssignee(null)
               }}
-              className="flex-1 px-2 py-1 text-xs border border-border rounded hover:bg-muted"
+              className="flex-1 px-3 py-2 text-xs font-medium border border-border rounded-md hover:bg-muted/50 transition-all"
             >
               Cancel
             </button>
@@ -196,13 +196,13 @@ function DraggableCard({ card, users, onEdit }: { card: any; users: any[]; onEdi
         if ((e.target as HTMLElement).closest('button')) return
         onEdit(card)
       }}
-      className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing group"
+      className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-grab active:cursor-grabbing active:opacity-90 group"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          <p className="font-medium text-sm line-clamp-2">{card.title}</p>
+          <p className="font-semibold text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors">{card.title}</p>
           {card.description && (
-            <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 group-hover:text-muted-foreground/80 transition-colors">
               {card.description}
             </p>
           )}
@@ -212,7 +212,7 @@ function DraggableCard({ card, users, onEdit }: { card: any; users: any[]; onEdi
             e.stopPropagation()
             onEdit(card)
           }}
-          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded text-xs text-muted-foreground"
+          className="opacity-0 group-hover:opacity-100 p-2 hover:bg-muted rounded-md text-xs text-muted-foreground hover:text-foreground transition-all duration-200"
           title="Edit card"
         >
           ✎
@@ -221,16 +221,16 @@ function DraggableCard({ card, users, onEdit }: { card: any; users: any[]; onEdi
 
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         {card.labels && card.labels.length > 0 && (
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs font-medium">
             {card.labels[0].name}
           </Badge>
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           {card.due_date && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 group-hover:text-foreground/70 transition-colors">
               <Calendar className="h-3 w-3" />
               {new Date(card.due_date).toLocaleDateString('en-US', {
                 month: 'short',
@@ -240,7 +240,7 @@ function DraggableCard({ card, users, onEdit }: { card: any; users: any[]; onEdi
           )}
         </div>
         {card.assignee && (
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 group-hover:text-foreground/70 transition-colors">
             <User className="h-3 w-3" />
             {(card.assignee?.name || 'Assigned')?.split(' ')[0]}
           </span>
@@ -525,7 +525,7 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
   if (loading) {
     return (
       <div className="flex flex-col h-full bg-background">
-        <div className="border-b border-border bg-card p-6">
+        <div className="border-b border-border/50 bg-gradient-to-r from-card to-card/95 p-6">
           <h1 className="text-3xl font-bold">Kanban Board</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {currentProject?.name || 'Project'} • Task Management
@@ -542,21 +542,21 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
       <div className="flex flex-col h-full bg-background">
         {/* Header */}
-        <div className="border-b border-border bg-card p-6">
-          <h1 className="text-3xl font-bold">Kanban Board</h1>
+        <div className="border-b border-border/50 bg-gradient-to-r from-card to-card/95 p-6 shadow-sm">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Kanban Board</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {currentProject?.name || 'Project'} • Task Management
           </p>
         </div>
 
         {/* Board */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-background via-background to-muted/20">
           {columns.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No columns found. Creating default board...</p>
+              <p className="text-muted-foreground text-sm">No columns found. Creating default board...</p>
             </div>
           ) : (
-            <div className="flex gap-4">
+            <div className="flex gap-6 pb-6">
               {columns.map((column) => {
                 const columnCards = getCardsForColumn(column.id)
                 return (
@@ -588,9 +588,9 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
 
       {/* Edit Card Modal */}
       {editingCard && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card border border-border rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full mx-4 p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Edit Card</h2>
               <button
                 onClick={() => {
@@ -599,7 +599,7 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
                   setEditCardDesc('')
                   setEditCardAssignee(null)
                 }}
-                className="p-1 hover:bg-muted rounded"
+                className="p-2 hover:bg-muted rounded-md transition-all duration-200"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -607,36 +607,36 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                <label className="text-xs font-semibold text-foreground mb-2 block uppercase tracking-wide">
                   Title
                 </label>
                 <input
                   type="text"
                   value={editCardTitle}
                   onChange={(e) => setEditCardTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                <label className="text-xs font-semibold text-foreground mb-2 block uppercase tracking-wide">
                   Description
                 </label>
                 <textarea
                   value={editCardDesc}
                   onChange={(e) => setEditCardDesc(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                <label className="text-xs font-semibold text-foreground mb-2 block uppercase tracking-wide">
                   Assigned to
                 </label>
                 <select
                   value={editCardAssignee || ''}
                   onChange={(e) => setEditCardAssignee(e.target.value || null)}
-                  className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 >
                   <option value="">Unassigned</option>
                   {users.map((user) => (
@@ -652,7 +652,7 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
               <button
                 onClick={handleSaveCardEdit}
                 disabled={!editCardTitle.trim()}
-                className="flex-1 px-3 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-3 py-2 text-sm font-semibold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 Save Changes
               </button>
@@ -663,7 +663,7 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
                   setEditCardDesc('')
                   setEditCardAssignee(null)
                 }}
-                className="flex-1 px-3 py-2 text-sm border border-border rounded hover:bg-muted font-medium"
+                className="flex-1 px-3 py-2 text-sm font-semibold border border-border rounded-md hover:bg-muted/50 transition-all"
               >
                 Cancel
               </button>
