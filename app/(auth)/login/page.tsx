@@ -166,15 +166,15 @@ export default function LoginPage() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="flex w-full lg:w-1/2 items-center justify-center p-2 sm:p-6"
       >
-      <Card className="w-full max-w-md shadow-xl border-0 bg-card/95 backdrop-blur-sm">
-        <CardHeader className="space-y-3 text-center pb-6">
+      <Card className="w-full max-w-md shadow-2xl border border-border/50 bg-card/98 backdrop-blur-md rounded-2xl">
+        <CardHeader className="space-y-4 text-center pb-6 border-b border-border/40">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center pb-3"
+            className="flex justify-center pb-2"
           >
-            <div className="p-2 rounded-xl bg-primary/10 ring-1 ring-primary/20">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 ring-1 ring-primary/30 shadow-lg shadow-primary/10">
               <Image src="/penrose_image.png" alt="Froncort Logo" width={40} height={40} className="rounded-lg" />
             </div>
           </motion.div>
@@ -183,28 +183,28 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <CardTitle className="text-xl sm:text-2xl whitespace-nowrap">Welcome to Froncort<span className="text-primary"> Forge</span></CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Welcome to Froncort<span className="text-primary"> Forge</span></CardTitle>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <CardDescription>Manage, collaborate, execute - all in one place</CardDescription>
+            <CardDescription className="text-sm text-muted-foreground/90 font-medium">Manage, collaborate, execute - all in one place</CardDescription>
           </motion.div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5 pt-6">
           <motion.form
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
             onSubmit={handleLogin}
-            className="space-y-4"
+            className="space-y-5"
           >
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
+            <div className="space-y-3">
+              <label htmlFor="email" className="text-sm font-semibold text-foreground block">
+                Email Address
               </label>
               <Input
                 id="email"
@@ -213,11 +213,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
+                className="bg-background/50 border-border/60"
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
+            <div className="space-y-3">
+              <label htmlFor="password" className="text-sm font-semibold text-foreground block">
                 Password
               </label>
               <div className="relative">
@@ -228,13 +229,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
-                  className="pr-10"
+                  className="pr-10 bg-background/50 border-border/60"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-md p-1 hover:bg-muted/40"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -246,17 +247,19 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full mt-6" disabled={loading} size="lg">
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </motion.form>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-primary hover:underline">
-              Sign up
-            </Link>
-          </p>
+          <div className="pt-2">
+            <p className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 transition-colors duration-200">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
       </motion.div>

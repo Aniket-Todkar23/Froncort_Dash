@@ -288,7 +288,6 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
           .select('id, project_id')
 
         if (allBoardsError) {
-          console.error('Error fetching all boards:', allBoardsError)
           setLoading(false)
           return
         }
@@ -296,30 +295,21 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
         // Find the board for this project
         const board = allBoards?.find(b => b.project_id === params.projectId)
         if (!board) {
-          console.log('No board found for project:', params.projectId)
           setLoading(false)
           return
         }
 
         const boardIdValue = board.id
         setBoardId(boardIdValue)
-        console.log('Found board:', boardIdValue, 'for project:', params.projectId)
 
         // Get ALL columns
         const { data: allColumns, error: allColumnsError } = await supabase
           .from('kanban_columns')
           .select('*')
 
-        if (allColumnsError) {
-          console.error('Error fetching columns:', allColumnsError)
-          console.log('All columns:', allColumns)
-        } else {
-          console.log('All columns from DB:', allColumns?.length)
-          console.log('Looking for board ID:', boardIdValue)
-          console.log('Sample columns:', allColumns?.slice(0, 3).map(c => ({ id: c.id, board_id: c.board_id })))
+        if (!allColumnsError && allColumns) {
           // Filter columns for this board
           const boardColumns = allColumns?.filter(c => c.board_id === boardIdValue) || []
-          console.log('Filtered columns for this board:', boardColumns.length)
           setColumns(boardColumns)
         }
 
@@ -331,7 +321,6 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
 
         if (allUsers) {
           setUsers(allUsers)
-          console.log('Fetched users:', allUsers.length)
         }
 
         // Get ALL cards with assignee details
@@ -339,16 +328,12 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
           .from('kanban_cards')
           .select('*, assignee:assignee_id(id, name, avatar)')
 
-        if (cardsError) {
-          console.error('Error fetching cards:', cardsError)
-        } else {
+        if (!cardsError && allCards) {
           // Filter cards for this board
           const boardCards = allCards?.filter(c => c.board_id === boardIdValue) || []
-          console.log('Fetched cards for board:', boardCards.length)
           setCards(boardCards)
         }
-      } catch (err) {
-        console.error('Failed to fetch board data:', err)
+      } catch {
         setCards([])
         setColumns([])
       } finally {
@@ -357,7 +342,6 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
     }
 
     if (params.projectId) {
-      console.log('Fetching board data for project:', params.projectId)
       fetchBoardData()
     }
   }, [params.projectId])
@@ -390,7 +374,6 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
 
       if (error) {
         toast.error('Failed to update card')
-        console.error(error)
         return
       }
 
@@ -411,9 +394,8 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
       setEditCardDesc('')
       setEditCardAssignee(null)
       toast.success('Card updated successfully')
-    } catch (err) {
+    } catch {
       toast.error('Error updating card')
-      console.error(err)
     }
   }
 
@@ -445,7 +427,6 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
 
       if (error) {
         toast.error('Failed to create card')
-        console.error(error)
         return
       }
 
@@ -456,9 +437,8 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
       setIsAddingCard(false)
       setSelectedColumnId(null)
       toast.success('Card created successfully')
-    } catch (err) {
+    } catch {
       toast.error('Error creating card')
-      console.error(err)
     }
   }
 
@@ -514,8 +494,7 @@ export default function KanbanPage({ params }: { params: { projectId: string } }
         .from('kanban_cards')
         .update({ column_id: targetColumnId })
         .eq('id', activeCardId)
-    } catch (err) {
-      console.error('Failed to update card:', err)
+    } catch {
       toast.error('Failed to update card')
     }
 

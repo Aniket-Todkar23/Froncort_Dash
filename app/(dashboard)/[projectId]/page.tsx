@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useProjectStore } from '@/lib/stores/project-store'
+import { useProjectMembers } from '@/hooks/useProjectMembers'
 import { TeamMembersPanel } from '@/components/project/TeamMembersPanel'
 import { Plus, Users, FileText, Zap } from 'lucide-react'
 
@@ -15,6 +16,7 @@ export default function ProjectOverviewPage() {
   const { projects, setCurrentProject } = useProjectStore()
   const project = projects.find((p) => p.id === projectId)
   const [showMembersPanel, setShowMembersPanel] = useState(false)
+  const { members, currentUserRole } = useProjectMembers(projectId)
 
   // Sync current project when component mounts or projectId changes
   React.useEffect(() => {
@@ -23,8 +25,8 @@ export default function ProjectOverviewPage() {
     }
   }, [projectId, project, setCurrentProject])
 
-  // Get member count from project data
-  const memberCount = Array.isArray(project?.members) ? project.members.length : 0
+  // Get member count from the API
+  const memberCount = members.length
   
   // Mock page and task counts (these would come from database in production)
   const pageCount = 3
@@ -48,10 +50,12 @@ export default function ProjectOverviewPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-lg hover:border-blue-500/40 transition-all duration-300 group cursor-pointer" onClick={() => router.push(`/${projectId}/board`)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">Team Members</CardTitle>
+            <div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-all duration-200">
+              <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{memberCount}</div>
@@ -59,10 +63,12 @@ export default function ProjectOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-lg hover:border-purple-500/40 transition-all duration-300 group cursor-pointer" onClick={() => router.push(`/${projectId}/docs`)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pages</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">Pages</CardTitle>
+            <div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-all duration-200">
+              <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pageCount}</div>
@@ -70,10 +76,12 @@ export default function ProjectOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-lg hover:border-orange-500/40 transition-all duration-300 group cursor-pointer" onClick={() => router.push(`/${projectId}/board`)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tasks</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">Tasks</CardTitle>
+            <div className="p-2 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-all duration-200">
+              <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{taskCount}</div>
@@ -81,13 +89,15 @@ export default function ProjectOverviewPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/50 shadow-sm hover:shadow-lg hover:border-green-500/40 transition-all duration-300 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-green-500" />
+            <div className="p-2 rounded-lg bg-green-500/10 group-hover:bg-green-500/20 transition-all duration-200">
+              <div className="h-4 w-4 rounded-full bg-green-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-sm font-medium">Active</div>
+            <div className="text-sm font-medium text-green-600 dark:text-green-400">Active</div>
           </CardContent>
         </Card>
       </div>
@@ -104,10 +114,10 @@ export default function ProjectOverviewPage() {
             <h3 className="text-sm font-semibold mb-3">Team Members ({memberCount})</h3>
             <div className="space-y-2">
               {memberCount > 0 ? (
-                project?.members?.map((member) => {
-                  const userName = member.user?.name || 'Unknown'
-                  const userEmail = member.user?.email || ''
-                  const userRole = member.role || 'member'
+                members?.map((member) => {
+                  const userName = (member.user as any)?.name || 'Unknown'
+                  const userEmail = (member.user as any)?.email || ''
+                  const userRole = member.role || 'editor'
                   const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
                   return (
                     <div key={member.id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
@@ -131,32 +141,35 @@ export default function ProjectOverviewPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="pt-4 border-t">
-            <h3 className="text-sm font-semibold mb-3">Quick Actions</h3>
-            <div className="flex flex-wrap gap-2">
+          <div className="pt-4 border-t border-border/40">
+            <h3 className="text-sm font-semibold mb-4 text-foreground">Quick Actions</h3>
+            <div className="flex flex-wrap gap-3">
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => setShowMembersPanel(!showMembersPanel)}
+                className="border-border/50 hover:border-blue-500/60 hover:text-primary hover:bg-blue-500/5 transition-all duration-200 group"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                 Add Member
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => router.push(`/dashboard/${projectId}/docs`)}
+                onClick={() => router.push(`/${projectId}/docs`)}
+                className="border-border/50 hover:border-purple-500/60 hover:text-primary hover:bg-purple-500/5 transition-all duration-200 group"
               >
-                <FileText className="h-4 w-4 mr-2" />
-                New Page
+                <FileText className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
+                View Pages
               </Button>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => router.push(`/dashboard/${projectId}/board`)}
+                onClick={() => router.push(`/${projectId}/board`)}
+                className="border-border/50 hover:border-orange-500/60 hover:text-primary hover:bg-orange-500/5 transition-all duration-200 group"
               >
-                <Zap className="h-4 w-4 mr-2" />
-                New Task
+                <Zap className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
+                View Tasks
               </Button>
             </div>
           </div>
@@ -164,7 +177,7 @@ export default function ProjectOverviewPage() {
           {/* Members Panel */}
           {showMembersPanel && (
             <div className="pt-4 border-t">
-              <TeamMembersPanel projectId={projectId} currentUserRole="admin" />
+              <TeamMembersPanel projectId={projectId} currentUserRole={currentUserRole || 'member'} />
             </div>
           )}
         </CardContent>

@@ -15,12 +15,12 @@ export function TeamMembersPanel({ projectId, currentUserRole = 'member' }: Team
     useProjectMembers(projectId)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newMemberEmail, setNewMemberEmail] = useState('')
-  const [selectedRole, setSelectedRole] = useState('member')
+  const [selectedRole, setSelectedRole] = useState('editor')
   const [isAdding, setIsAdding] = useState(false)
   const [allUsers, setAllUsers] = useState<any[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
 
-  const canManageMembers = ['owner', 'admin'].includes(currentUserRole)
+  const canManageMembers = ['owner', 'admin'].includes(currentUserRole || '')
 
   const handleFetchUsers = async () => {
     setLoadingUsers(true)
@@ -148,7 +148,7 @@ export function TeamMembersPanel({ projectId, currentUserRole = 'member' }: Team
                 className="w-full px-3 py-2 text-sm border border-border rounded bg-background"
               >
                 <option value="viewer">Viewer (Read-only)</option>
-                <option value="member">Member (Edit)</option>
+                <option value="editor">Editor (Edit)</option>
                 <option value="admin">Admin (Manage)</option>
               </select>
             </div>
@@ -200,7 +200,7 @@ export function TeamMembersPanel({ projectId, currentUserRole = 'member' }: Team
                     className="px-2 py-1 text-xs border border-border rounded bg-background"
                   >
                     <option value="viewer">Viewer</option>
-                    <option value="member">Member</option>
+                    <option value="editor">Editor</option>
                     <option value="admin">Admin</option>
                   </select>
                 ) : (

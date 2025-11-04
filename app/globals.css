@@ -127,6 +127,106 @@
   }
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.8);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes button-pop {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(5deg);
+  }
+}
+
+@keyframes text-highlight {
+  0% {
+    color: hsl(var(--foreground));
+  }
+  50% {
+    color: hsl(var(--primary));
+  }
+  100% {
+    color: hsl(var(--foreground));
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -139,47 +239,403 @@
   animation: slideInLeft 0.3s ease-out;
 }
 
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+.animate-button-pop {
+  animation: button-pop 0.4s ease-out;
+}
+
+.animate-icon-bounce {
+  animation: icon-bounce 0.5s ease-in-out;
+}
+
+.animate-text-highlight {
+  animation: text-highlight 0.6s ease-in-out;
+}
+
+/* Cool hover effect utilities */
+.hover-lift {
+  @apply transition-all duration-200;
+}
+
+.hover-lift:hover {
+  @apply -translate-y-1 shadow-lg;
+}
+
+.hover-glow {
+  @apply transition-all duration-200;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+}
+
+.hover-shimmer {
+  @apply relative overflow-hidden;
+}
+
+.hover-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.dark .hover-shimmer::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--primary) / 0.2),
+    transparent
+  );
+}
+
+.hover-shimmer:hover::before {
+  left: 100%;
+}
+
+/* Custom button shimmer effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.dark .btn-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--primary) / 0.4),
+    transparent
+  );
+}
+
+.btn-shimmer:hover::after {
+  left: 100%;
+}
+
+/* Header-specific cool effects */
+header {
+  @apply relative;
+}
+
+/* Icon button hover effects in header */
+header button[size="icon"] {
+  @apply relative transition-all duration-200 ease-out;
+}
+
+header button[size="icon"]:not(:disabled):hover {
+  @apply scale-110 -translate-y-0.5;
+  box-shadow: 0 8px 16px rgba(var(--primary), 0.15);
+}
+
+/* Avatar button special effects */
+header .rounded-full:not(:disabled):hover {
+  @apply scale-105;
+}
+
+/* Notification badge glow */
+header .animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dropdown menu animations */
+.animate-in {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+.zoom-in-95 {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Search input floating effect on focus */
+input:focus {
+  @apply shadow-lg;
+}
+
+/* Result item hover effects */
+button:has(+ div:not(:empty)):hover {
+  @apply bg-primary/5;
+}
+
+/* Sidebar button special effects */
+aside button[variant="outline"] {
+  @apply relative overflow-hidden transition-all duration-200;
+}
+
+aside button[variant="outline"]:not(:disabled):hover {
+  @apply border-primary/60 shadow-lg shadow-primary/25;
+}
+
+/* Dashboard button in sidebar */
+aside .rounded-lg:not(:disabled):hover {
+  background: linear-gradient(90deg, rgba(var(--primary), 0.05), rgba(var(--primary), 0.1), rgba(var(--primary), 0.05));
+}
+
+/* New Project button glow */
+aside button:has(svg[class*="Plus"]):not(:disabled):hover {
+  @apply text-primary;
+}
+
+/* Sidebar project expansion button */
+aside button[class*="rounded-lg"]:not(:disabled):hover {
+  @apply -translate-y-0.5 shadow-md shadow-primary/20;
+}
+
+/* Project navigation buttons */
+aside nav button:hover {
+  @apply shadow-sm shadow-primary/10;
+}
+
+/* Text color visibility improvements */
+/* Ensure text is visible on hover backgrounds */
+::-webkit-scrollbar-thumb {
+  @apply transition-all duration-200;
+}
+
+/* High contrast for active states */
+button:has(span):not(:disabled):hover {
+  --text-opacity: 1;
+}
+
+/* Muted text on hover should become visible */
+.text-muted-foreground:hover {
+  @apply text-foreground/80 transition-colors duration-150;
+}
+
+/* Sidebar navigation text contrast */
+aside nav a[class*="text-muted"] {
+  @apply text-foreground/70 transition-colors duration-150;
+}
+
+aside nav a[class*="text-muted"]:hover {
+  @apply text-foreground transition-colors duration-150;
+}
+
+/* Ensure primary text is always visible */
+.text-primary {
+  @apply brightness-105;
+}
+
+/* Header text visibility */
+header .text-sm:not([class*="text-primary"]) {
+  @apply text-foreground font-medium;
+}
+
+/* Dropdown menu text contrast */
+.bg-card button[class*="text-left"] {
+  @apply text-foreground transition-colors duration-150;
+}
+
+.bg-card button[class*="text-left"]:hover {
+  @apply text-primary transition-colors duration-150;
+}
+
 /* Professional component enhancements */
 @layer components {
-  /* Cards with subtle shadows */
+  /* Cards with subtle shadows and transitions */
   .card {
     @apply transition-all duration-200 ease-out;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
   
   .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    @apply -translate-y-0.5;
   }
   
-  /* Improved button styling */
+  /* Cool button hover effects */
   button, [role="button"] {
-    @apply transition-all duration-150 ease-out;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1;
+    @apply transition-all duration-200 ease-out relative overflow-hidden;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2;
+  }
+  
+  /* Shimmer effect for primary buttons */
+  button[class*="bg-primary"]:not(:disabled):hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: shimmer 0.6s ease-out;
+  }
+  
+  /* Dark mode shimmer fix */
+  .dark button[class*="bg-primary"]:not(:disabled):hover::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--primary) / 0.3),
+      transparent
+    );
+  }
+  
+  /* Glow effect for outline buttons */
+  button[class*="border"]:not(:disabled):hover {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+  }
+  
+  /* Scale and glow for ghost buttons */
+  button[class*="ghost"]:not(:disabled):hover {
+    @apply scale-105;
+    box-shadow: 0 4px 12px rgba(var(--primary), 0.15);
   }
   
   button:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    @apply opacity-40 cursor-not-allowed;
   }
   
-  /* Input focus states */
+  /* Input focus states with improved visibility */
   input, textarea, select {
-    @apply transition-colors duration-150;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
   }
   
-  /* Link hover states */
+  input:disabled, textarea:disabled, select:disabled {
+    @apply bg-muted/30 cursor-not-allowed;
+  }
+  
+  /* Cool link hover effects */
   a:not([class*="no-underline"]) {
-    @apply transition-colors duration-150;
+    @apply transition-all duration-200 relative;
   }
   
-  /* Badge improvements */
+  /* Underline animation for links */
+  a[class*="hover:underline"]::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+    transition: width 0.3s ease-out;
+  }
+  
+  a[class*="hover:underline"]:hover::after {
+    width: 100%;
+  }
+  
+  /* Text color animation for links */
+  a[class*="text-primary"] {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)),
+      hsl(var(--primary)),
+      hsl(var(--primary) / 0.8),
+      hsl(var(--primary))
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+  
+  /* Badge improvements with better styling */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full font-medium text-sm transition-all duration-150;
+    @apply inline-flex items-center px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200;
   }
   
-  /* List items with better spacing */
+  .badge:hover {
+    @apply scale-105 shadow-sm;
+  }
+  
+  /* List items with better hover effects */
   li {
-    @apply transition-colors duration-150;
+    @apply transition-all duration-200;
+  }
+  
+  /* Improved label styling */
+  label {
+    @apply transition-colors duration-200;
+  }
+  
+  /* Section improvements */
+  section {
+    @apply transition-all duration-300;
+  }
+  
+  /* Navigation link hover effects */
+  nav a {
+    @apply relative transition-all duration-200;
+  }
+  
+  nav a:hover {
+    @apply scale-105;
+  }
+  
+  /* Special hover effect for sidebar navigation */
+  aside nav a:hover {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0.1),
+      hsl(var(--primary) / 0.05),
+      transparent
+    );
+  }
+  
+  /* Project card hover effects */
+  [class*="grid"] a[href*="/"]:hover .card {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card)),
+      hsl(var(--primary) / 0.02),
+      hsl(var(--card))
+    );
   }
 }
 

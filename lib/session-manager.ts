@@ -24,7 +24,6 @@ export const sessionManager = {
     }
 
     localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    console.log('Session saved, expires at:', new Date(expiresAt).toISOString())
   },
 
   // Get current session
@@ -39,14 +38,12 @@ export const sessionManager = {
 
       // Check if session is expired
       if (session.expiresAt < Date.now()) {
-        console.log('Session expired')
         sessionManager.clearSession()
         return null
       }
 
       return session
-    } catch (err) {
-      console.error('Error parsing session:', err)
+    } catch {
       return null
     }
   },
@@ -71,7 +68,6 @@ export const sessionManager = {
       })
 
       if (error || !data.session) {
-        console.error('Failed to refresh session:', error)
         sessionManager.clearSession()
         return false
       }
@@ -84,8 +80,7 @@ export const sessionManager = {
       )
 
       return true
-    } catch (err) {
-      console.error('Error refreshing session:', err)
+    } catch {
       return false
     }
   },
@@ -94,7 +89,6 @@ export const sessionManager = {
   clearSession: () => {
     if (typeof window === 'undefined') return
     localStorage.removeItem(SESSION_KEY)
-    console.log('Session cleared')
   },
 
   // Get time until expiry in milliseconds

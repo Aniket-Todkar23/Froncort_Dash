@@ -20,6 +20,7 @@ export function useProjectMembers(projectId: string | null) {
   const [members, setMembers] = useState<ProjectMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     if (!projectId) {
@@ -31,6 +32,7 @@ export function useProjectMembers(projectId: string | null) {
       try {
         setLoading(true)
         const supabase = getSupabaseClient()
+        
         const response = await fetch(`/api/projects/${projectId}/members`, {
           method: 'GET',
           headers: {
@@ -45,6 +47,14 @@ export function useProjectMembers(projectId: string | null) {
 
         const data = await response.json()
         setMembers(data.members)
+        
+        // Get current user's role from members list
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const currentMember = data.members.find((m: ProjectMember) => m.user_id === user.id)
+          setCurrentUserRole(currentMember?.role || null)
+        }
+        
         setError(null)
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Error fetching members'
@@ -143,6 +153,7 @@ export function useProjectMembers(projectId: string | null) {
     members,
     loading,
     error,
+    currentUserRole,
     addMember,
     removeMember,
     updateMemberRole,

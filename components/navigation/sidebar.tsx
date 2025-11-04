@@ -36,16 +36,14 @@ export function Sidebar() {
           .order('created_at', { ascending: false })
 
         if (error) {
-          console.error('Error fetching projects:', error)
+          // Handle error silently
         } else if (allProjects && allProjects.length > 0) {
-          console.log('Fetched projects from DB:', allProjects.length)
           setProjects(allProjects as any)
         } else {
-          console.log('No projects found')
           setProjects([])
         }
-      } catch (err) {
-        console.error('Failed to fetch projects:', err)
+      } catch {
+        // Handle error silently
       } finally {
         setLoading(false)
       }
@@ -75,7 +73,6 @@ export function Sidebar() {
       const { data: { user }, error: userError } = await supabase.auth.getUser()
 
       if (userError || !user) {
-        console.error('User not authenticated')
         return
       }
 
@@ -92,7 +89,6 @@ export function Sidebar() {
         .single()
 
       if (error) {
-        console.error('Error creating project:', error)
         return
       }
 
@@ -121,8 +117,8 @@ export function Sidebar() {
       setNewProjectName('')
       setExpandedProjects([...expandedProjects, newProj.id])
       setCurrentProject(newProj as any)
-    } catch (err) {
-      console.error('Failed to create project:', err)
+    } catch {
+      // Handle error silently
     } finally {
       setIsCreatingProject(false)
     }
@@ -146,7 +142,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 whitespace-nowrap">
-            <Image src="/penrose_image.png" alt="Froncort Logo" width={32} height={32} className="rounded-lg" />
+            <Image src="/penrose_image.png" alt="Froncort Logo" width={32} height={32} style={{ width: 'auto', height: 'auto' }} className="rounded-lg" />
             <span className="font-bold text-lg">Froncort<span className="text-primary"> Forge</span></span>
           </Link>
           <Button

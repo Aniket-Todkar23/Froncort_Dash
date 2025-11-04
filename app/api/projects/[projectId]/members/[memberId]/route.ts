@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function DELETE(
@@ -6,10 +6,22 @@ export async function DELETE(
   { params }: { params: { projectId: string; memberId: string } }
 ) {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Fallback: extract user from auth token cookie if Supabase session fails
+    let userId = user?.id
+    if (!userId) {
+      const authCookie = req.cookies.get('sb-uyrgjrnfmuookcrhtifu-auth-token')?.value
+      if (authCookie) {
+        try {
+          const authData = JSON.parse(authCookie)
+          userId = authData.user?.id
+        } catch (e) {}
+      }
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -18,10 +30,21 @@ export async function DELETE(
       .from('project_members')
       .select('role')
       .eq('project_id', params.projectId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
-    if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    // Also check if user is the project owner
+    const { data: projectOwner } = await supabase
+      .from('projects')
+      .select('owner_id')
+      .eq('id', params.projectId)
+      .single()
+
+    const isOwner = projectOwner?.owner_id === userId || 
+                   projectOwner?.owner_id?.toString().toLowerCase() === userId?.toString().toLowerCase()
+    const isAdminOrMember = membership && ['owner', 'admin'].includes(membership.role)
+
+    if (!isOwner && !isAdminOrMember) {
       return NextResponse.json(
         { error: 'Only project admins/owners can remove members' },
         { status: 403 }
@@ -59,8 +82,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Error removing member:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -73,10 +95,22 @@ export async function PATCH(
   { params }: { params: { projectId: string; memberId: string } }
 ) {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Fallback: extract user from auth token cookie if Supabase session fails
+    let userId = user?.id
+    if (!userId) {
+      const authCookie = req.cookies.get('sb-uyrgjrnfmuookcrhtifu-auth-token')?.value
+      if (authCookie) {
+        try {
+          const authData = JSON.parse(authCookie)
+          userId = authData.user?.id
+        } catch (e) {}
+      }
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -85,10 +119,21 @@ export async function PATCH(
       .from('project_members')
       .select('role')
       .eq('project_id', params.projectId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
-    if (!membership || membership.role !== 'owner') {
+    // Also check if user is the project owner
+    const { data: projectOwner } = await supabase
+      .from('projects')
+      .select('owner_id')
+      .eq('id', params.projectId)
+      .single()
+
+    const isOwner = projectOwner?.owner_id === userId || 
+                   projectOwner?.owner_id?.toString().toLowerCase() === userId?.toString().toLowerCase()
+    const isMemberOwner = membership && membership.role === 'owner'
+
+    if (!isOwner && !isMemberOwner) {
       return NextResponse.json(
         { error: 'Only project owners can change member roles' },
         { status: 403 }
@@ -98,7 +143,7 @@ export async function PATCH(
     const body = await req.json()
     const { role } = body
 
-    if (!role || !['owner', 'admin', 'member', 'viewer'].includes(role)) {
+    if (!role || !['owner', 'admin', 'editor', 'viewer'].includes(role)) {
       return NextResponse.json(
         { error: 'Invalid role' },
         { status: 400 }
@@ -119,8 +164,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ member: updatedMember })
-  } catch (error) {
-    console.error('Error updating member role:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

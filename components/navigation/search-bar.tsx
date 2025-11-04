@@ -117,50 +117,54 @@ export function SearchBar() {
 
   return (
     <div ref={searchRef} className="relative w-full max-w-sm">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative group">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
         <Input
           placeholder="Search pages, projects..."
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => query && setIsOpen(true)}
-          className="pl-10"
+          className="pl-10 pr-3 rounded-lg bg-muted/40 border-muted/60 group-hover:border-primary/40 group-focus-within:border-primary group-focus-within:bg-muted/60 shadow-sm group-hover:shadow-md group-hover:shadow-primary/10 transition-all duration-200"
         />
       </div>
 
       {isOpen && (query || results.length > 0) && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-3 bg-card border border-border/50 rounded-xl shadow-xl z-50 max-h-96 overflow-y-auto animate-in zoom-in-95 duration-200 backdrop-blur-sm">
           {isLoading && (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              Searching...
+            <div className="p-6 text-center text-sm text-muted-foreground font-medium">
+              <div className="inline-block">
+                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+              </div>
+              <p className="mt-2">Searching...</p>
             </div>
           )}
 
           {!isLoading && results.length === 0 && query && (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              No results found for &quot;{query}&quot;
+            <div className="p-6 text-center">
+              <p className="text-sm text-muted-foreground font-medium">No results found</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">for &quot;{query}&quot;</p>
             </div>
           )}
 
           {!isLoading && results.length > 0 && (
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border/40 py-1">
               {results.map((result) => (
                 <button
                   key={`${result.type}-${result.id}`}
                   onClick={() => handleResultClick(result)}
-                  className="w-full text-left px-4 py-3 hover:bg-muted transition-colors flex items-start gap-3"
+                  className="w-full text-left px-4 py-3 hover:bg-primary/5 hover:border-l-2 hover:border-l-primary transition-all duration-150 flex items-start gap-3 group/result"
                 >
-                  <div className="text-muted-foreground mt-1">
+                  <div className="text-muted-foreground group-hover/result:text-primary mt-1 transition-colors duration-150">
                     {getIcon(result.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{result.title}</p>
+                    <p className="font-semibold text-sm truncate text-foreground group-hover/result:text-primary transition-colors duration-150">{result.title}</p>
                     {result.description && (
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-xs text-muted-foreground/80 truncate group-hover/result:text-muted-foreground transition-colors duration-150">
                         {result.description}
                       </p>
                     )}
-                    <p className="text-xs text-muted-foreground capitalize mt-1">
+                    <p className="text-xs text-muted-foreground/60 capitalize mt-1.5 font-medium">
                       {result.type}
                     </p>
                   </div>

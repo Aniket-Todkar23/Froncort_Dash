@@ -26,7 +26,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const session = sessionManager.getSession()
       if (session && session.user) {
         setUser(session.user, 'editor')
-        console.log('✅ Session restored from storage')
         setIsHydrating(false)
         return
       }

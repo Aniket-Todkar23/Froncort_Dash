@@ -1,12 +1,24 @@
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Fallback: extract user from auth token cookie if Supabase session fails
+    let userId = user?.id
+    if (!userId) {
+      const authCookie = req.cookies.get('sb-uyrgjrnfmuookcrhtifu-auth-token')?.value
+      if (authCookie) {
+        try {
+          const authData = JSON.parse(authCookie)
+          userId = authData.user?.id
+        } catch {}
+      }
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -14,7 +26,7 @@ export async function GET(req: NextRequest) {
     const { data: users, error } = await supabase
       .from('users')
       .select('id, name, email, avatar')
-      .neq('id', user.id)
+      .neq('id', userId)
       .order('name', { ascending: true })
 
     if (error) {
@@ -22,8 +34,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ users })
-  } catch (error) {
-    console.error('Error fetching users:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

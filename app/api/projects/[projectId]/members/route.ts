@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -6,22 +6,50 @@ export async function GET(
   { params }: { params: { projectId: string } }
 ) {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Fallback: extract user from auth token cookie if Supabase session fails
+    let userId = user?.id
+    if (!userId) {
+      const authCookie = req.cookies.get('sb-uyrgjrnfmuookcrhtifu-auth-token')?.value
+      if (authCookie) {
+        try {
+          const authData = JSON.parse(authCookie)
+          userId = authData.user?.id
+        } catch {}
+      }
+    }
+
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+
     // Verify user is member of this project
-    const { data: membership } = await supabase
+    const { data: membership, error: membershipError } = await supabase
       .from('project_members')
       .select('*')
       .eq('project_id', params.projectId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
-    if (!membership) {
+    // Also check if user is the project owner
+    const { data: projectOwner } = await supabase
+      .from('projects')
+      .select('owner_id')
+      .eq('id', params.projectId)
+      .single()
+    
+
+    const isOwner = projectOwner?.owner_id === userId || 
+                   projectOwner?.owner_id?.toString().toLowerCase() === userId?.toString().toLowerCase()
+
+    // membership could be null even if user is in the table if error occurs
+    const hasMembership = membership && !membershipError
+
+    if (!hasMembership && !isOwner) {
       return NextResponse.json(
         { error: 'Not a member of this project' },
         { status: 403 }
@@ -39,8 +67,7 @@ export async function GET(
     }
 
     return NextResponse.json({ members })
-  } catch (error) {
-    console.error('Error fetching members:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -53,22 +80,45 @@ export async function POST(
   { params }: { params: { projectId: string } }
 ) {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Fallback: extract user from auth token cookie if Supabase session fails
+    let userId = user?.id
+    if (!userId) {
+      const authCookie = req.cookies.get('sb-uyrgjrnfmuookcrhtifu-auth-token')?.value
+      if (authCookie) {
+        try {
+          const authData = JSON.parse(authCookie)
+          userId = authData.user?.id
+        } catch {}
+      }
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verify user is admin/owner of project
+    // Verify user is admin/owner of project or project owner
     const { data: membership } = await supabase
       .from('project_members')
       .select('role')
       .eq('project_id', params.projectId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
-    if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    // Also check if user is the project owner
+    const { data: projectOwner } = await supabase
+      .from('projects')
+      .select('owner_id')
+      .eq('id', params.projectId)
+      .single()
+
+    const isOwner = projectOwner?.owner_id === userId || 
+                   projectOwner?.owner_id?.toString().toLowerCase() === userId?.toString().toLowerCase()
+    const isAdminOrMember = membership && ['owner', 'admin'].includes(membership.role)
+
+    if (!isOwner && !isAdminOrMember) {
       return NextResponse.json(
         { error: 'Only project admins/owners can add members' },
         { status: 403 }
@@ -76,7 +126,7 @@ export async function POST(
     }
 
     const body = await req.json()
-    const { user_id, role = 'member' } = body
+    const { user_id, role = 'editor' } = body
 
     if (!user_id) {
       return NextResponse.json(
@@ -92,7 +142,7 @@ export async function POST(
         project_id: params.projectId,
         user_id,
         role,
-        assigned_by: user.id,
+        assigned_by: userId,
       })
       .select('*, user:user_id(id, name, email, avatar)')
       .single()
@@ -108,8 +158,7 @@ export async function POST(
     }
 
     return NextResponse.json({ member: newMember }, { status: 201 })
-  } catch (error) {
-    console.error('Error adding member:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

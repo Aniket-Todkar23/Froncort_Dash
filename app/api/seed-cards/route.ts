@@ -109,18 +109,15 @@ async function seedCards() {
     const { data, error } = await supabase.from('kanban_cards').insert(SEED_CARDS).select()
 
     if (error) {
-      console.error('Error seeding cards:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('✓ Successfully seeded', SEED_CARDS.length, 'cards')
     return NextResponse.json({
       success: true,
       message: `Seeded ${SEED_CARDS.length} cards`,
       cards: data,
     })
-  } catch (error) {
-    console.error('Fatal error:', error)
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

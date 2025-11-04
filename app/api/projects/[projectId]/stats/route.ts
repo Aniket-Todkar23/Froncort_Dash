@@ -64,8 +64,7 @@ export async function GET(
       pageCount: pageCount || 0,
       taskCount: cardCount,
     })
-  } catch (error) {
-    console.error('Error fetching project stats:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

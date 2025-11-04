@@ -1,21 +1,25 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useProjectStore } from '@/lib/stores/project-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, Users, Lock, Trash2, Save } from 'lucide-react'
+import { Settings, Users, Lock, Trash2, Save, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 export default function SettingsPage({ params }: { params: { projectId: string } }) {
-  const { currentProject, projects } = useProjectStore()
+  const router = useRouter()
+  const { currentProject, projects, setCurrentProject } = useProjectStore()
   const project = projects.find((p) => p.id === params.projectId)
   
   const [projectName, setProjectName] = useState(project?.name || '')
   const [projectDescription, setProjectDescription] = useState(project?.description || '')
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const handleSaveSettings = async () => {
     if (!projectName.trim()) {
@@ -41,6 +45,66 @@ export default function SettingsPage({ params }: { params: { projectId: string }
       toast.error('Failed to save settings')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleDeleteProject = async () => {
+    try {
+      setIsDeleting(true)
+      const supabase = getSupabaseClient()
+
+      // Delete all kanban boards and related data for this project
+      const { data: boards } = await supabase
+        .from('kanban_boards')
+        .select('id')
+        .eq('project_id', params.projectId)
+
+      if (boards && boards.length > 0) {
+        const boardIds = boards.map((b) => b.id)
+        // Delete columns
+        await supabase
+          .from('kanban_columns')
+          .delete()
+          .in('board_id', boardIds)
+        // Delete cards
+        await supabase
+          .from('kanban_cards')
+          .delete()
+          .in('board_id', boardIds)
+      }
+
+      // Delete all pages
+      await supabase
+        .from('pages')
+        .delete()
+        .eq('project_id', params.projectId)
+
+      // Delete all activities
+      await supabase
+        .from('activities')
+        .delete()
+        .eq('project_id', params.projectId)
+
+      // Delete the project itself
+      const { error: deleteError } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', params.projectId)
+
+      if (deleteError) throw deleteError
+
+      // Clear from store
+      setCurrentProject(null)
+      toast.success('Project deleted successfully')
+      
+      // Redirect to dashboard
+      router.push('/')
+    } catch (err) {
+      console.error('Error deleting project:', err)
+      toast.error('Failed to delete project')
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteConfirm(false)
     }
   }
 
@@ -177,7 +241,7 @@ export default function SettingsPage({ params }: { params: { projectId: string }
               <CardDescription className="text-xs">Irreversible actions</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="destructive" className="w-full font-semibold" disabled>
+              <Button variant="destructive" className="w-full font-semibold" onClick={() => setShowDeleteConfirm(true)}>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Project
               </Button>
@@ -188,6 +252,48 @@ export default function SettingsPage({ params }: { params: { projectId: string }
           </Card>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-md border-destructive/40 shadow-lg">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                Delete Project?
+              </CardTitle>
+              <CardDescription className="text-xs">This action cannot be undone</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+                <p className="text-sm text-foreground font-medium">You are about to permanently delete:</p>
+                <p className="text-sm font-semibold text-destructive mt-2">"{project.name}"</p>
+                <p className="text-xs text-muted-foreground/80 mt-3">
+                  This will delete all associated pages, kanban boards, cards, and activities. This action is permanent and cannot be reversed.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1 font-semibold"
+                  onClick={handleDeleteProject}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Project'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

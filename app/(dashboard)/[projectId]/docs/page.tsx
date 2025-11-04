@@ -156,20 +156,14 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
           .select('*')
 
         if (pagesError) {
-          console.error('Error fetching pages:', pagesError)
           setError(pagesError.message)
           setPages([])
         } else {
-          console.log('All pages from DB:', allPages?.length)
-          console.log('Current project ID:', params.projectId)
-          console.log('Sample page projects:', allPages?.slice(0, 5).map(p => ({ id: p.id, title: p.title, proj: p.project_id })))
           // Filter pages for this project
           let projectPages = allPages?.filter(p => p.project_id === params.projectId) || []
-          console.log('Filtered pages for this project:', projectPages.length)
           
           // If no pages found and we have any pages, show first 3 as demo
           if (projectPages.length === 0 && allPages && allPages.length > 0) {
-            console.log('No pages for this project, showing sample pages')
             projectPages = allPages.slice(0, 5)
           }
           
@@ -177,7 +171,6 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
           setError(null)
         }
       } catch (err: any) {
-        console.error('Failed to fetch pages:', err)
         setError(err.message || 'Failed to fetch pages')
         setPages([])
       } finally {
@@ -266,9 +259,8 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
       setProjectPages(params.projectId, updatedPages)
       setNewPageTitle('')
       toast.success('Page created successfully')
-    } catch (err) {
+    } catch {
       toast.error('Failed to create page')
-      console.error(err)
     } finally {
       setIsCreating(false)
     }
