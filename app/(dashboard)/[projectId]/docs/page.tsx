@@ -69,47 +69,47 @@ function PageTreeItem({
 
   return (
     <div>
-      <div className="flex items-center gap-2 py-2 px-3 hover:bg-muted rounded-md group">
+      <div className="flex items-center gap-2 py-2.5 px-3 hover:bg-primary/5 rounded-lg group transition-colors duration-150">
         {hasChildren && (
           <button
             onClick={() => onExpand(node.id)}
-            className="flex-shrink-0 hover:bg-muted rounded"
+            className="flex-shrink-0 hover:bg-muted rounded-md transition-colors duration-150 p-0.5"
           >
             {isExpanded ? (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4 text-foreground/70" />
             ) : (
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 text-foreground/60" />
             )}
           </button>
         )}
-        {!hasChildren && <div className="w-4" />}
+        {!hasChildren && <div className="w-5" />}
 
-        <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <FileText className="h-4 w-4 text-primary/70 flex-shrink-0" />
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Link
             href={`/${projectId}/docs/${node.id}`}
-            className="text-sm hover:text-primary transition-colors hover:underline"
+            className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-150 hover:underline block truncate"
           >
             {node.title}
           </Link>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Last edited by {node.updatedBy?.name || 'Unknown'} • {new Date(node.updatedAt).toLocaleDateString()}
+          <div className="text-xs text-muted-foreground/80 mt-0.5">
+            Edited by {node.updatedBy?.name || 'Unknown'} • {new Date(node.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </div>
         </div>
 
-        <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
-          <button className="p-1 hover:bg-background rounded text-xs text-muted-foreground">
-            <Edit2 className="h-3 w-3" />
+        <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-all duration-200 flex-shrink-0">
+          <button className="p-1.5 hover:bg-muted rounded-md text-xs text-muted-foreground hover:text-foreground transition-colors duration-150">
+            <Edit2 className="h-3.5 w-3.5" />
           </button>
-          <button className="p-1 hover:bg-destructive/10 rounded text-xs text-destructive hover:text-destructive">
-            <Trash2 className="h-3 w-3" />
+          <button className="p-1.5 hover:bg-destructive/10 rounded-md text-xs text-destructive hover:text-destructive transition-colors duration-150">
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
       {hasChildren && isExpanded && (
-        <div className="ml-4 border-l border-border">
+        <div className="ml-2 border-l-2 border-border/40 pl-2">
           {node.children.map((child) => (
             <PageTreeItem
               key={child.id}
@@ -279,11 +279,11 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="border-b border-border p-6 space-y-4">
+      <div className="border-b border-border/50 bg-gradient-to-r from-card to-card/95 p-6 space-y-4 shadow-sm">
         <div>
-          <h1 className="text-3xl font-bold">Documentation</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Documentation</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {currentProject?.name || 'Project'} • {pages.length} pages
+            {currentProject?.name || 'Project'} • <span className="font-medium text-foreground">{pages.length}</span> pages
           </p>
         </div>
 
@@ -297,9 +297,9 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
               if (e.key === 'Enter') handleCreatePage()
             }}
             disabled={isCreating}
-            className="flex-1"
+            className="flex-1 bg-background"
           />
-          <Button onClick={handleCreatePage} disabled={isCreating || !newPageTitle.trim()}>
+          <Button onClick={handleCreatePage} disabled={isCreating || !newPageTitle.trim()} className="font-medium">
             <Plus className="h-4 w-4 mr-2" />
             New Page
           </Button>
@@ -307,24 +307,30 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
       </div>
 
       {/* Pages List */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-background via-background to-muted/20">
         {loading && (
-          <div className="text-center text-muted-foreground py-8">Loading pages...</div>
+          <div className="text-center text-muted-foreground py-12 text-sm">Loading pages...</div>
         )}
 
         {error && (
-          <div className="text-center text-destructive py-8">Error: {error}</div>
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive text-sm">
+            <p className="font-medium mb-1">Error loading pages</p>
+            <p>{error}</p>
+          </div>
         )}
 
         {!loading && pages.length === 0 && (
-          <div className="text-center text-muted-foreground py-8">
-            <FileText className="h-12 w-12 mx-auto opacity-30 mb-2" />
-            <p>No pages yet. Create your first page to get started!</p>
+          <div className="text-center text-muted-foreground py-12">
+            <div className="flex justify-center mb-3">
+              <FileText className="h-12 w-12 opacity-20" />
+            </div>
+            <p className="font-medium text-foreground mb-1">No pages yet</p>
+            <p className="text-sm">Create your first page to get started!</p>
           </div>
         )}
 
         {!loading && pages.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5 max-w-3xl">
             {tree.map((node) => (
               <PageTreeItem
                 key={node.id}
