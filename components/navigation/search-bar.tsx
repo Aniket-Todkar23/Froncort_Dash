@@ -138,7 +138,7 @@ export function SearchBar() {
 
           {!isLoading && results.length === 0 && query && (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              No results found for "{query}"
+              No results found for &quot;{query}&quot;
             </div>
           )}
 
