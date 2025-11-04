@@ -118,7 +118,7 @@ export default function ProjectOverviewPage() {
                   const userName = (member.user as any)?.name || 'Unknown'
                   const userEmail = (member.user as any)?.email || ''
                   const userRole = member.role || 'editor'
-                  const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+                  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
                   return (
                     <div key={member.id} className="flex items-center justify-between p-2 rounded hover:bg-muted">
                       <div className="flex items-center gap-3">

@@ -267,7 +267,7 @@ export default function SettingsPage({ params }: { params: { projectId: string }
             <CardContent className="space-y-4">
               <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30">
                 <p className="text-sm text-foreground font-medium">You are about to permanently delete:</p>
-                <p className="text-sm font-semibold text-destructive mt-2">"{project.name}"</p>
+                <p className="text-sm font-semibold text-destructive mt-2">&quot;{project.name}&quot;</p>
                 <p className="text-xs text-muted-foreground/80 mt-3">
                   This will delete all associated pages, kanban boards, cards, and activities. This action is permanent and cannot be reversed.
                 </p>

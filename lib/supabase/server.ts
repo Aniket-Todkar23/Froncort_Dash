@@ -17,15 +17,19 @@ export function createServerSupabaseClient(request?: NextRequest) {
     supabaseKey,
     {
       cookies: {
-        getAll() {
-          const allCookies = cookieStore.getAll()
-          return allCookies
+        get(name: string) {
+          return cookieStore.get(name)?.value
         },
-        setAll(cookiesToSet) {
+        set(name: string, value: string, options: any) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options)
-            })
+            cookieStore.set(name, value, options)
+          } catch (error) {
+            // Ignore errors in API routes
+          }
+        },
+        remove(name: string, options: any) {
+          try {
+            cookieStore.delete(name)
           } catch (error) {
             // Ignore errors in API routes
           }

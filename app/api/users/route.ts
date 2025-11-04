@@ -23,10 +23,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch all users (excluding current user)
-    const { data: users, error } = await supabase
+    const { data: users, error } = await (supabase
       .from('users')
       .select('id, name, email, avatar')
-      .neq('id', userId)
+      .neq('id', userId as any) as any)
       .order('name', { ascending: true })
 
     if (error) {

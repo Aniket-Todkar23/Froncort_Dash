@@ -28,18 +28,19 @@ export async function GET(
 
 
     // Verify user is member of this project
-    const { data: membership, error: membershipError } = await supabase
+    const projectId = String(params.projectId)
+    const { data: membership, error: membershipError } = await (supabase
       .from('project_members')
       .select('*')
-      .eq('project_id', params.projectId)
-      .eq('user_id', userId)
+      .eq('project_id', projectId as any)
+      .eq('user_id', userId as any) as any)
       .single()
 
     // Also check if user is the project owner
-    const { data: projectOwner } = await supabase
+    const { data: projectOwner } = await (supabase
       .from('projects')
       .select('owner_id')
-      .eq('id', params.projectId)
+      .eq('id', projectId as any) as any)
       .single()
     
 
@@ -57,10 +58,10 @@ export async function GET(
     }
 
     // Get all members of the project
-    const { data: members, error } = await supabase
+    const { data: members, error } = await (supabase
       .from('project_members')
       .select('*, user:user_id(id, name, email, avatar)')
-      .eq('project_id', params.projectId)
+      .eq('project_id', projectId as any) as any)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -100,18 +101,19 @@ export async function POST(
     }
 
     // Verify user is admin/owner of project or project owner
-    const { data: membership } = await supabase
+    const projectId = String(params.projectId)
+    const { data: membership } = await (supabase
       .from('project_members')
       .select('role')
-      .eq('project_id', params.projectId)
-      .eq('user_id', userId)
+      .eq('project_id', projectId as any)
+      .eq('user_id', userId as any) as any)
       .single()
 
     // Also check if user is the project owner
-    const { data: projectOwner } = await supabase
+    const { data: projectOwner } = await (supabase
       .from('projects')
       .select('owner_id')
-      .eq('id', params.projectId)
+      .eq('id', projectId as any) as any)
       .single()
 
     const isOwner = projectOwner?.owner_id === userId || 
@@ -136,15 +138,15 @@ export async function POST(
     }
 
     // Add member to project
-    const { data: newMember, error } = await supabase
+    const { data: newMember, error } = await (supabase
       .from('project_members')
       .insert({
-        project_id: params.projectId,
-        user_id,
+        project_id: projectId as any,
+        user_id: user_id as any,
         role,
-        assigned_by: userId,
-      })
-      .select('*, user:user_id(id, name, email, avatar)')
+        assigned_by: userId as any,
+      } as any)
+      .select('*, user:user_id(id, name, email, avatar)') as any)
       .single()
 
     if (error) {

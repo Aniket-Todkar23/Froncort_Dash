@@ -26,18 +26,19 @@ export async function DELETE(
     }
 
     // Verify user is admin/owner of project
-    const { data: membership } = await supabase
+    const projectId = String(params.projectId)
+    const { data: membership } = await (supabase
       .from('project_members')
       .select('role')
-      .eq('project_id', params.projectId)
-      .eq('user_id', userId)
+      .eq('project_id', projectId as any)
+      .eq('user_id', userId as any) as any)
       .single()
 
     // Also check if user is the project owner
-    const { data: projectOwner } = await supabase
+    const { data: projectOwner } = await (supabase
       .from('projects')
       .select('owner_id')
-      .eq('id', params.projectId)
+      .eq('id', projectId as any) as any)
       .single()
 
     const isOwner = projectOwner?.owner_id === userId || 
@@ -52,11 +53,11 @@ export async function DELETE(
     }
 
     // Get member to remove
-    const { data: memberToRemove } = await supabase
+    const { data: memberToRemove } = await (supabase
       .from('project_members')
       .select('*')
-      .eq('id', params.memberId)
-      .eq('project_id', params.projectId)
+      .eq('id', params.memberId as any)
+      .eq('project_id', projectId as any) as any)
       .single()
 
     if (!memberToRemove) {
@@ -72,10 +73,10 @@ export async function DELETE(
     }
 
     // Remove member
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('project_members')
       .delete()
-      .eq('id', params.memberId)
+      .eq('id', params.memberId as any) as any)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -115,18 +116,19 @@ export async function PATCH(
     }
 
     // Verify user is owner of project (only owners can change roles)
-    const { data: membership } = await supabase
+    const projectId = String(params.projectId)
+    const { data: membership } = await (supabase
       .from('project_members')
       .select('role')
-      .eq('project_id', params.projectId)
-      .eq('user_id', userId)
+      .eq('project_id', projectId as any)
+      .eq('user_id', userId as any) as any)
       .single()
 
     // Also check if user is the project owner
-    const { data: projectOwner } = await supabase
+    const { data: projectOwner } = await (supabase
       .from('projects')
       .select('owner_id')
-      .eq('id', params.projectId)
+      .eq('id', projectId as any) as any)
       .single()
 
     const isOwner = projectOwner?.owner_id === userId || 
@@ -151,11 +153,11 @@ export async function PATCH(
     }
 
     // Update member role
-    const { data: updatedMember, error } = await supabase
+    const { data: updatedMember, error } = await (supabase
       .from('project_members')
-      .update({ role })
-      .eq('id', params.memberId)
-      .eq('project_id', params.projectId)
+      .update({ role } as any)
+      .eq('id', params.memberId as any)
+      .eq('project_id', projectId as any) as any)
       .select('*, user:user_id(id, name, email, avatar)')
       .single()
 
