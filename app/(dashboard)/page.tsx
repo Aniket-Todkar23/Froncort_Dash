@@ -40,7 +40,7 @@ import { SEED_PROJECTS } from '@/lib/constants/seed-data'
 export default function DashboardPage() {
   const router = useRouter()
   const { currentUser } = useUserStore()
-  const { setProjects } = useProjectStore()
+  const { setProjects, setCurrentProject } = useProjectStore()
   const { projects: dbProjects, loading, error } = useProjectsDb(currentUser?.id || '')
   const { activities, loading: activitiesLoading, error: activitiesError } = useAllActivities(currentUser?.id || '', 10)
 
@@ -53,6 +53,10 @@ export default function DashboardPage() {
 
   const handleCreateProject = () => {
     router.push('/create-project')
+  }
+
+  const handleProjectClick = (project: any) => {
+    setCurrentProject(project)
   }
 
   return (
@@ -180,7 +184,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {dbProjects.map((project: any) => (
-              <Link key={project?.id || project} href={`/${project?.id || project}`}>
+              <Link key={project?.id || project} href={`/${project?.id || project}`} onClick={() => handleProjectClick(project)}>
                 <Card className="h-full shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 transition-shadow cursor-pointer">
                   <CardHeader>
                     <CardTitle className="line-clamp-2">{project.name}</CardTitle>
@@ -218,11 +222,12 @@ export default function DashboardPage() {
                   const userInitials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
                   const timeAgo = getTimeAgo(new Date(activity.created_at))
                   const bgColorClass = getColorClass(activity.action)
-                  const resourceTypeLabel = {
+                  const resourceTypeLabels: Record<string, string> = {
                     page: 'Page',
                     card: 'Task',
                     member: 'Member',
-                  }[activity.resource_type] || activity.resource_type
+                  }
+                  const resourceTypeLabel = resourceTypeLabels[activity.resource_type as string] || activity.resource_type
 
                   return (
                     <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
