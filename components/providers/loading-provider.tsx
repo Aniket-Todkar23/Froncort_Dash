@@ -17,7 +17,7 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
     if (document.readyState === 'loading') {
       startLoading()
     }
-  }, [])
+  }, [startLoading])
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
