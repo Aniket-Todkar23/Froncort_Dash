@@ -51,10 +51,8 @@ export function Sidebar() {
       }
     }
 
-    if (projects.length === 0) {
-      fetchProjects()
-    }
-  }, [])
+    fetchProjects()
+  }, [setProjects])
 
   useEffect(() => {
     if (projects.length > 0 && !currentProject) {
