@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { getCurrentUser } from '@/lib/supabase/auth'
 import type { Database } from '@/lib/supabase/types'
 
 type KanbanBoard = Database['public']['Tables']['kanban_boards']['Row']
