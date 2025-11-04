@@ -126,7 +126,7 @@ function PageTreeItem({
 }
 
 export default function DocsPage({ params }: { params: { projectId: string } }) {
-  const { currentProject } = useProjectStore()
+  const { currentProject, projects, setCurrentProject } = useProjectStore()
   
   const [pages, setPages] = useState<any[]>([])
   const [expanded, setExpanded] = useState<Set<string>>(new Set(['root']))
@@ -134,6 +134,14 @@ export default function DocsPage({ params }: { params: { projectId: string } }) 
   const [isCreating, setIsCreating] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Sync current project when component mounts or projectId changes
+  useEffect(() => {
+    const project = projects.find((p) => p.id === params.projectId)
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [params.projectId, projects, setCurrentProject])
 
   // Fetch pages from database
   useEffect(() => {

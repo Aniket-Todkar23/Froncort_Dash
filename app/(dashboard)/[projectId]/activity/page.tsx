@@ -50,11 +50,12 @@ function ActivityAction({ action }: { action: string }) {
 }
 
 function ActivityItem({ activity }: { activity: any }) {
-  const resourceTypeLabel = {
+  const resourceTypeLabels: Record<string, string> = {
     page: 'Page',
     card: 'Task',
     member: 'Member',
-  }[activity.resource_type] || activity.resource_type
+  }
+  const resourceTypeLabel = resourceTypeLabels[activity.resource_type as string] || activity.resource_type
 
   return (
     <div className="flex gap-4 py-4 px-6 hover:bg-muted/30 border-b border-border last:border-0 transition-colors">

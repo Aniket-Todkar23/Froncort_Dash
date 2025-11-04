@@ -124,7 +124,7 @@ export default function EditorPage({
       console.log('[Editor] Syncing remote content, length:', remoteContent.length)
       setPageContent(remoteContent)
     }
-  }, [remoteContent])
+  }, [remoteContent, pageContent])
 
   const autoSaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const hasContentChangesRef = React.useRef(false)

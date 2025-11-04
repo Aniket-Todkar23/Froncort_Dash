@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws'
+import { WebSocketServer, WebSocket } from 'ws'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'net'
@@ -32,7 +32,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   server.on('upgrade', (request, socket, head) => {
     if (request.url === '/api/collaboration') {
-      wss.handleUpgrade(request, socket as Socket, head, (ws: ExtendedWebSocket) => {
+      wss.handleUpgrade(request, socket as Socket, head, (ws: any) => {
         wss.emit('connection', ws, request)
       })
     }
@@ -51,12 +51,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             ws.userId = message.userId
             ws.userName = message.userName
 
-            if (!pageClients.has(ws.pageId)) {
+            if (ws.pageId && !pageClients.has(ws.pageId)) {
               pageClients.set(ws.pageId, [])
             }
-            pageClients.get(ws.pageId)!.push(ws)
+            if (ws.pageId) pageClients.get(ws.pageId)!.push(ws)
 
-            broadcastToPage(ws.pageId, {
+            if (ws.pageId) broadcastToPage(ws.pageId, {
               type: 'USER_JOINED',
               userId: ws.userId,
               userName: ws.userName,
