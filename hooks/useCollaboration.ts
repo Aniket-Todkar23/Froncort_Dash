@@ -56,8 +56,9 @@ export function useCollaboration({
     // Prevent multiple connections
     if (socketRef.current?.connected) return
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080'
-
+    // Use Next.js API endpoint for socket (works on Vercel)
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || `${typeof window !== 'undefined' ? window.location.origin : ''}`
+    
     const socket = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
