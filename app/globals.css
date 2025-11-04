@@ -58,10 +58,10 @@
   }
 }
 
-/* Custom scrollbar */
+/* Professional scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -69,12 +69,17 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* Editor styles */
@@ -132,4 +137,85 @@
 
 .animate-slideInLeft {
   animation: slideInLeft 0.3s ease-out;
+}
+
+/* Professional component enhancements */
+@layer components {
+  /* Cards with subtle shadows */
+  .card {
+    @apply transition-all duration-200 ease-out;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Improved button styling */
+  button, [role="button"] {
+    @apply transition-all duration-150 ease-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1;
+  }
+  
+  button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  
+  /* Input focus states */
+  input, textarea, select {
+    @apply transition-colors duration-150;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1;
+  }
+  
+  /* Link hover states */
+  a:not([class*="no-underline"]) {
+    @apply transition-colors duration-150;
+  }
+  
+  /* Badge improvements */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full font-medium text-sm transition-all duration-150;
+  }
+  
+  /* List items with better spacing */
+  li {
+    @apply transition-colors duration-150;
+  }
+}
+
+/* Smooth page transitions */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageEnter 0.3s ease-out;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted) / 0.5) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 1000px 100%;
 }

@@ -256,10 +256,10 @@ export function Sidebar() {
                     toggleProject(project.id)
                   }}
                   className={cn(
-                    'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-between',
+                    'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-between',
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'text-foreground hover:bg-muted/50 hover:shadow-sm'
                   )}
                 >
                   <span className="truncate">{project.name}</span>

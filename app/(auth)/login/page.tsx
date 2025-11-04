@@ -166,15 +166,17 @@ export default function LoginPage() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="flex w-full lg:w-1/2 items-center justify-center p-2 sm:p-6"
       >
-      <Card className="w-full max-w-md shadow-lg shadow-primary/20">
-        <CardHeader className="space-y-2 text-center">
+      <Card className="w-full max-w-md shadow-xl border-0 bg-card/95 backdrop-blur-sm">
+        <CardHeader className="space-y-3 text-center pb-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center pb-2"
+            className="flex justify-center pb-3"
           >
-            <Image src="/penrose_image.png" alt="Froncort Logo" width={40} height={40} className="rounded-lg" />
+            <div className="p-2 rounded-xl bg-primary/10 ring-1 ring-primary/20">
+              <Image src="/penrose_image.png" alt="Froncort Logo" width={40} height={40} className="rounded-lg" />
+            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}

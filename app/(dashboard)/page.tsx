@@ -107,42 +107,48 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {loading ? (
           <>
-            <Card className="overflow-hidden shadow-md shadow-primary/10"><CardLoader /></Card>
-            <Card className="overflow-hidden shadow-md shadow-primary/10"><CardLoader /></Card>
-            <Card className="overflow-hidden shadow-md shadow-primary/10"><CardLoader /></Card>
+            <Card className="overflow-hidden border-0"><CardLoader /></Card>
+            <Card className="overflow-hidden border-0"><CardLoader /></Card>
+            <Card className="overflow-hidden border-0"><CardLoader /></Card>
           </>
         ) : (
           <>
-            <Card className="shadow-md shadow-primary/10">
+            <Card className="border-0 hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-semibold text-muted-foreground">Total Projects</CardTitle>
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <FileText className="h-4 w-4 text-primary" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dbProjects?.length || 0}</div>
-                <p className="text-xs text-muted-foreground">Active projects</p>
+                <div className="text-3xl font-bold tracking-tight">{dbProjects?.length || 0}</div>
+                <p className="text-xs text-muted-foreground mt-1">Active projects</p>
               </CardContent>
             </Card>
 
-            <Card className="shadow-md shadow-primary/10">
+            <Card className="border-0 hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
-                <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-semibold text-muted-foreground">Active Tasks</CardTitle>
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">Across all boards</p>
+                <div className="text-3xl font-bold tracking-tight">12</div>
+                <p className="text-xs text-muted-foreground mt-1">Across all boards</p>
               </CardContent>
             </Card>
 
-            <Card className="shadow-md shadow-primary/10">
+            <Card className="border-0 hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-semibold text-muted-foreground">Team Members</CardTitle>
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">7</div>
-                <p className="text-xs text-muted-foreground">Collaborating</p>
+                <div className="text-3xl font-bold tracking-tight">7</div>
+                <p className="text-xs text-muted-foreground mt-1">Collaborating</p>
               </CardContent>
             </Card>
           </>
