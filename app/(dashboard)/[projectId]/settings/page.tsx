@@ -55,42 +55,43 @@ export default function SettingsPage({ params }: { params: { projectId: string }
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="border-b border-border bg-card p-6">
-        <h1 className="text-3xl font-bold">Project Settings</h1>
+      <div className="border-b border-border/50 bg-gradient-to-r from-card to-card/95 p-6 shadow-sm">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Project Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your project configuration</p>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-background via-background to-muted/20">
         <div className="max-w-2xl space-y-6">
           {/* General Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Settings className="h-5 w-5 text-primary" />
                 General
               </CardTitle>
-              <CardDescription>Basic project information</CardDescription>
+              <CardDescription className="text-xs">Basic project information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Project Name</label>
+                <label className="text-sm font-semibold mb-2 block text-foreground">Project Name</label>
                 <Input
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   placeholder="Enter project name"
+                  className="bg-background/50 border-border/60 focus:ring-primary/50"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Description</label>
+                <label className="text-sm font-semibold mb-2 block text-foreground">Description</label>
                 <textarea
                   value={projectDescription}
                   onChange={(e) => setProjectDescription(e.target.value)}
                   placeholder="Enter project description"
-                  className="w-full min-h-24 p-2 border border-border rounded-md bg-background text-foreground"
+                  className="w-full min-h-24 p-3 border border-border/60 rounded-lg bg-background/50 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
-              <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full">
+              <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full font-semibold">
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </Button>
@@ -98,13 +99,13 @@ export default function SettingsPage({ params }: { params: { projectId: string }
           </Card>
 
           {/* Team Members */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Users className="h-5 w-5 text-primary" />
                 Team Members
               </CardTitle>
-              <CardDescription>Manage project members and permissions</CardDescription>
+              <CardDescription className="text-xs">Manage project members and permissions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {project.members && project.members.length > 0 ? (
@@ -115,13 +116,13 @@ export default function SettingsPage({ params }: { params: { projectId: string }
                     return (
                       <div
                         key={i}
-                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                        className="flex items-center justify-between p-3 bg-muted/40 hover:bg-muted/60 rounded-lg border border-border/40 transition-colors duration-150"
                       >
                         <div>
-                          <p className="text-sm font-medium">{userName}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{userRole}</p>
+                          <p className="text-sm font-semibold text-foreground">{userName}</p>
+                          <p className="text-xs text-muted-foreground/80 capitalize font-medium">{userRole}</p>
                         </div>
-                        <Button variant="outline" size="sm" disabled>
+                        <Button variant="outline" size="sm" disabled className="text-xs">
                           {userRole === 'owner' ? 'Owner' : 'Remove'}
                         </Button>
                       </div>
@@ -129,34 +130,37 @@ export default function SettingsPage({ params }: { params: { projectId: string }
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No team members yet</p>
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground/80 font-medium">No team members yet</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">Add members to collaborate</p>
+                </div>
               )}
             </CardContent>
           </Card>
 
           {/* Privacy & Security */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Lock className="h-5 w-5 text-primary" />
                 Privacy & Security
               </CardTitle>
-              <CardDescription>Control project visibility and access</CardDescription>
+              <CardDescription className="text-xs">Control project visibility and access</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50">
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-4 border border-border/60 rounded-lg cursor-pointer hover:bg-primary/5 transition-colors duration-150">
                   <input type="radio" name="visibility" value="private" defaultChecked />
                   <div>
-                    <p className="font-medium text-sm">Private</p>
-                    <p className="text-xs text-muted-foreground">Only team members can access</p>
+                    <p className="font-semibold text-sm text-foreground">Private</p>
+                    <p className="text-xs text-muted-foreground/80">Only team members can access</p>
                   </div>
                 </label>
-                <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50">
+                <label className="flex items-center gap-3 p-4 border border-border/60 rounded-lg cursor-pointer hover:bg-primary/5 transition-colors duration-150">
                   <input type="radio" name="visibility" value="public" />
                   <div>
-                    <p className="font-medium text-sm">Public</p>
-                    <p className="text-xs text-muted-foreground">Anyone with the link can view</p>
+                    <p className="font-semibold text-sm text-foreground">Public</p>
+                    <p className="text-xs text-muted-foreground/80">Anyone with the link can view</p>
                   </div>
                 </label>
               </div>
@@ -164,20 +168,20 @@ export default function SettingsPage({ params }: { params: { projectId: string }
           </Card>
 
           {/* Danger Zone */}
-          <Card className="border-red-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600">
+          <Card className="border-destructive/40 bg-destructive/5 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg text-destructive">
                 <Trash2 className="h-5 w-5" />
                 Danger Zone
               </CardTitle>
-              <CardDescription>Irreversible actions</CardDescription>
+              <CardDescription className="text-xs">Irreversible actions</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="destructive" className="w-full" disabled>
+              <Button variant="destructive" className="w-full font-semibold" disabled>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Project
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground/80 mt-3">
                 Once you delete a project, there is no going back. Please be certain.
               </p>
             </CardContent>
