@@ -32,8 +32,8 @@ export function useSocketCollaboration(
       return
     }
 
-    // Connect to socket.io server on port 8080
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080'
+    // Connect to socket.io server
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080'
     const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,

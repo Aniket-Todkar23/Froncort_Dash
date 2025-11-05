@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: froncort-socket-server
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/socket-server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080

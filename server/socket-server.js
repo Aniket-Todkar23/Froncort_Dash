@@ -114,6 +114,10 @@ function getRandomColor() {
 }
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`Socket.io collaboration server running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+server.listen(PORT, HOST, () => {
+  console.log(`Socket.io collaboration server running on http://${HOST}:${PORT}`);
 });
+
+module.exports = { server, io };
