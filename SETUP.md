@@ -1,4 +1,4 @@
-# Froncort - Setup Guide
+# Quill Sync - Setup Guide
 
 ## 🚀 Quick Start
 
@@ -134,7 +134,7 @@ COLLABORATION_SERVER_PORT=8080
 ## 📁 Project Structure
 
 ```
-froncort/
+quill-sync/
 ├── app/                      # Next.js app directory
 │   ├── (auth)/              # Authentication pages
 │   ├── (dashboard)/         # Dashboard layout

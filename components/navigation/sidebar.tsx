@@ -142,8 +142,8 @@ export function Sidebar() {
       <div className="p-6 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 whitespace-nowrap">
-            <Image src="/penrose_image.png" alt="Froncort Logo" width={32} height={32} style={{ width: 'auto', height: 'auto' }} className="rounded-lg" />
-            <span className="font-bold text-lg">Froncort<span className="text-primary"> Forge</span></span>
+            <Image src="/penrose_image.png" alt="Quill Sync Logo" width={32} height={32} style={{ width: 'auto', height: 'auto' }} className="rounded-lg" />
+            <span className="font-bold text-lg">Quill<span className="text-primary"> Sync</span></span>
           </Link>
           <Button
             size="icon"

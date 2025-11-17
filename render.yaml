@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: froncort-socket-server
+    name: quill-sync-socket-server
     runtime: node
     plan: free
     buildCommand: npm install

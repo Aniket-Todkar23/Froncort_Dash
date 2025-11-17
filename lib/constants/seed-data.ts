@@ -137,7 +137,7 @@ export const SEED_PAGES: Page[] = [
     projectId: 'proj-1',
     title: 'Getting Started Guide',
     content:
-      '<h2>Welcome to Froncort</h2><p>Froncort is a collaborative project management tool that combines the best of Confluence and Jira.</p><h3>Key Features</h3><ul><li>Real-time collaborative editing</li><li>Kanban boards for task management</li><li>Version history and rollback</li><li>@mentions and notifications</li></ul>',
+      '<h2>Welcome to Quill Sync</h2><p>Quill Sync is a collaborative project management tool that combines the best of Confluence and Jira.</p><h3>Key Features</h3><ul><li>Real-time collaborative editing</li><li>Kanban boards for task management</li><li>Version history and rollback</li><li>@mentions and notifications</li></ul>',
     parentId: undefined,
     order: 1,
     createdBy: '1',
@@ -165,7 +165,7 @@ export const SEED_PAGES: Page[] = [
     projectId: 'proj-2',
     title: 'API Reference',
     content:
-      '<h2>Froncort API Reference</h2><p>Complete API documentation for Froncort integration.</p><h3>Authentication</h3><p>All requests require a valid API token in the Authorization header.</p>',
+      '<h2>Quill Sync API Reference</h2><p>Complete API documentation for Quill Sync integration.</p><h3>Authentication</h3><p>All requests require a valid API token in the Authorization header.</p>',
     parentId: undefined,
     order: 1,
     createdBy: '2',

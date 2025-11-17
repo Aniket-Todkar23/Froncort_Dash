@@ -175,7 +175,7 @@ export default function LoginPage() {
             className="flex justify-center pb-2"
           >
             <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 ring-1 ring-primary/30 shadow-lg shadow-primary/10">
-              <Image src="/penrose_image.png" alt="Froncort Logo" width={40} height={40} className="rounded-lg" />
+              <Image src="/penrose_image.png" alt="Quill Sync Logo" width={40} height={40} className="rounded-lg" />
             </div>
           </motion.div>
           <motion.div
@@ -183,7 +183,7 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Welcome to Froncort<span className="text-primary"> Forge</span></CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Welcome to Quill<span className="text-primary"> Sync</span></CardTitle>
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}

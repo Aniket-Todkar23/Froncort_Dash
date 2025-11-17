@@ -7,7 +7,7 @@ interface SessionData {
   user: any
 }
 
-const SESSION_KEY = 'froncort_session'
+const SESSION_KEY = 'quill_sync_session'
 const SESSION_EXPIRY_TIME = 12 * 60 * 60 * 1000 // 12 hours in milliseconds
 
 export const sessionManager = {

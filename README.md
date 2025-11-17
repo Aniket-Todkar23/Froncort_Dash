@@ -1,10 +1,10 @@
-# Froncort
+# Quill Sync
 
 A modern, real-time collaborative document editor built with Next.js and WebSocket technology. Create, edit, and collaborate on documents seamlessly with instant synchronization and live user presence.
 
 ## Overview
 
-Froncort is a full-stack web application that enables multiple users to edit documents simultaneously in real-time. The platform combines a responsive React frontend with a Node.js backend for seamless collaboration, powered by Supabase for authentication and data persistence.
+Quill Sync is a full-stack web application that enables multiple users to edit documents simultaneously in real-time. The platform combines a responsive React frontend with a Node.js backend for seamless collaboration, powered by Supabase for authentication and data persistence.
 
 ## Features
 
@@ -69,7 +69,7 @@ Froncort is a full-stack web application that enables multiple users to edit doc
 
 ```bash
 git clone <repository-url>
-cd froncort
+cd quill-sync
 ```
 
 ### 2. Install Dependencies
@@ -154,7 +154,7 @@ npm run typecheck
 ## Project Structure
 
 ```
-froncort/
+quill-sync/
 ├── app/                      # Next.js App Router
 │   ├── (auth)/              # Authentication pages
 │   ├── (dashboard)/         # Main application
@@ -200,8 +200,8 @@ The Next.js frontend is deployed on Vercel for optimal performance and seamless 
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
-NEXT_PUBLIC_APP_URL=https://froncort.vercel.app (or your custom domain)
-NEXT_PUBLIC_SOCKET_SERVER_URL=https://froncort-dash.onrender.com
+NEXT_PUBLIC_APP_URL=https://quill-sync.vercel.app (or your custom domain)
+NEXT_PUBLIC_SOCKET_SERVER_URL=https://quill-sync-dash.onrender.com
 ```
 
 ### Socket Server Deployment
@@ -246,12 +246,12 @@ GitHub Repository
     ↓
 Vercel (Frontend) ←→ Render (Socket Server) → Supabase (Database)
     ↓
-https://froncort.vercel.app
+https://quill-sync.vercel.app
 ```
 
 **URL Structure**:
-- Frontend: `https://froncort.vercel.app`
-- Socket Server: `https://froncort-dash.onrender.com`
+- Frontend: `https://quill-sync.vercel.app`
+- Socket Server: `https://quill-sync-dash.onrender.com`
 - Database: Supabase Project URL
 
 ## Real-Time Communication Architecture

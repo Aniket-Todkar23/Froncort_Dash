@@ -8,7 +8,7 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Froncort - Collaborative Project Management',
+  title: 'Quill Sync - Collaborative Project Management',
   description: 'Confluence-style documentation + Jira-style Kanban boards',
 }
 
